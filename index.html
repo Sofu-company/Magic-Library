@@ -63,7 +63,9 @@ textarea.modal-input { resize:vertical; }
 .btn-search { background:var(--pink-400); color:white; border:none; padding:8px 16px; border-radius:10px; font-size:13px; cursor:pointer; flex-shrink:0; }
 .modal-overlay { display:none; position:fixed; inset:0; background:rgba(60,10,30,0.4); z-index:200; align-items:flex-end; justify-content:center; }
 .modal-overlay.open { display:flex; }
-.modal { background:var(--card); border-radius:24px 24px 0 0; padding:20px 18px 36px; width:100%; max-width:480px; max-height:92vh; overflow-y:auto; }
+.modal { background:var(--card); border-radius:24px 24px 0 0; padding:20px 18px 28px; width:100%; max-width:480px; max-height:88vh; overflow-y:auto; display:flex; flex-direction:column; }
+#modal-step-search { display:flex; flex-direction:column; flex:1; min-height:0; }
+#modal-search-results { flex:1; overflow-y:auto; max-height:55vh; margin-bottom:10px; }
 .modal-handle { width:36px; height:4px; background:var(--pink-100); border-radius:2px; margin:0 auto 16px; }
 .modal-title { font-size:16px; font-weight:600; color:var(--text); margin-bottom:16px; }
 .rating-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
@@ -243,7 +245,7 @@ textarea.modal-input { resize:vertical; }
         </div>
         <button class="btn-search" id="btn-modal-search-go" style="font-size:12px;">Buscar</button>
       </div>
-      <div id="modal-search-results" style="max-height:45vh;overflow-y:auto;margin-bottom:10px;"></div>
+      <div id="modal-search-results"></div>
       <button id="btn-modal-manual" style="width:100%;padding:12px;border-radius:14px;border:1.5px dashed var(--pink-200);background:var(--pink-50);color:var(--pink-600);font-size:13px;cursor:pointer;display:none;">
         ✏️ No encontré mi libro, agregar manualmente
       </button>
@@ -583,7 +585,7 @@ function resetModal() {
   currentStatus = 'tbr'; currentRec = null; selectedCover = '';
   ratings = {general:0,spice:0,fluff:0,llorar:0,humor:0,plot:0,mundo:0};
   selectedTags = [];
-  selectedGenero = '';
+  selectedGeneros = [];
   document.getElementById('modal-titulo').value = '';
   document.getElementById('modal-autor').value = '';
   document.getElementById('modal-genero').value = '';
@@ -762,17 +764,22 @@ const TROPES_POR_GENERO = {
 };
 
 let selectedTags = [];
-let selectedGenero = '';
+let selectedGeneros = [];
 
 function renderGenrePills() {
   const el = document.getElementById('genre-pills');
   el.innerHTML = GENEROS.map(g =>
-    `<span class="status-pill ${selectedGenero===g.id?'active':''}" data-genre="${g.id}" style="font-size:12px;">${g.label}</span>`
+    `<span class="genre-pill ${selectedGeneros.includes(g.id)?'active':''}" data-genre="${g.id}">${g.label}</span>`
   ).join('');
-  el.querySelectorAll('.status-pill').forEach(pill => {
+  el.querySelectorAll('.genre-pill').forEach(pill => {
     pill.addEventListener('click', () => {
-      selectedGenero = pill.dataset.genre;
-      document.getElementById('modal-genero').value = selectedGenero;
+      const g = pill.dataset.genre;
+      if (selectedGeneros.includes(g)) {
+        selectedGeneros = selectedGeneros.filter(x => x !== g);
+      } else {
+        selectedGeneros.push(g);
+      }
+      document.getElementById('modal-genero').value = selectedGeneros.join(',');
       renderGenrePills();
       renderTagSuggestions();
     });
@@ -796,16 +803,22 @@ function renderTags() {
 
 function renderTagSuggestions() {
   const sugEl = document.getElementById('modal-tags-sugeridos');
-  const sugeridos = TROPES_POR_GENERO[selectedGenero] || [];
+  // Merge tropes from all selected genres, dedup
+  let sugeridos = [];
+  selectedGeneros.forEach(g => {
+    (TROPES_POR_GENERO[g] || []).forEach(t => { if (!sugeridos.includes(t)) sugeridos.push(t); });
+  });
+  if (sugeridos.length === 0) sugeridos = ['enemies to lovers','slow burn','found family','fake dating','friends to lovers','forbidden love','second chance','forced proximity','coming of age','chosen one'];
   const disponibles = sugeridos.filter(t => !selectedTags.includes(t));
   if (disponibles.length === 0) {
-    sugEl.innerHTML = selectedGenero ? '<div style="font-size:11px;color:var(--muted);">¡Ya agregaste todos los tropes sugeridos!</div>' : '<div style="font-size:11px;color:var(--muted);">Seleccioná un género para ver tropes sugeridos.</div>';
+    sugEl.innerHTML = '<div style="font-size:11px;color:var(--muted);">¡Ya agregaste todos los tropes sugeridos!</div>';
     return;
   }
-  sugEl.innerHTML = disponibles.map(t =>
-    `<span style="padding:4px 10px;border-radius:20px;background:var(--pink-50);color:var(--pink-600);font-size:11px;cursor:pointer;border:0.5px solid var(--pink-100);" data-tag="${escHtml(t)}">${escHtml(t)} +</span>`
-  ).join('');
-  sugEl.querySelectorAll('span[data-tag]').forEach(el => {
+  sugEl.innerHTML = '<div style="font-size:11px;color:var(--muted);width:100%;margin-bottom:4px;">sugeridos:</div>' +
+    disponibles.map(t =>
+      `<span class="trope-pill" data-tag="${escHtml(t)}">${escHtml(t)} +</span>`
+    ).join('');
+  sugEl.querySelectorAll('.trope-pill').forEach(el => {
     el.addEventListener('click', () => {
       if (!selectedTags.includes(el.dataset.tag)) selectedTags.push(el.dataset.tag);
       renderTags(); renderTagSuggestions();
@@ -826,13 +839,15 @@ function fillModalFromBook(info) {
   selectedCover = info.imageLinks?.thumbnail || '';
   document.getElementById('modal-titulo').value = info.title || '';
   document.getElementById('modal-autor').value = info.authors?.[0] || '';
-  // Auto-fill genre from Google Books categories
+  // Auto-fill genres from Google Books categories
   const cats = info.categories || [];
-  if (cats.length > 0) {
-    const raw = cats[0].split('/')[0].trim().toLowerCase();
+  selectedGeneros = [];
+  cats.forEach(cat => {
+    const raw = cat.split('/')[0].trim().toLowerCase();
     const match = GENEROS.find(g => raw.includes(g.id) || g.id.includes(raw));
-    if (match) { selectedGenero = match.id; document.getElementById('modal-genero').value = match.id; }
-  }
+    if (match && !selectedGeneros.includes(match.id)) selectedGeneros.push(match.id);
+  });
+  document.getElementById('modal-genero').value = selectedGeneros.join(',');
   renderGenrePills();
   renderTagSuggestions();
   const preview = document.getElementById('modal-book-preview');
@@ -925,7 +940,7 @@ document.getElementById('btn-modal-search-go').addEventListener('click', doModal
 document.getElementById('modal-search-input').addEventListener('keydown', e => { if(e.key==='Enter') doModalSearch(); });
 document.getElementById('btn-modal-manual').addEventListener('click', () => {
   selectedTags = [];
-  selectedGenero = '';
+  selectedGeneros = [];
   document.getElementById('modal-titulo').value = '';
   document.getElementById('modal-autor').value = '';
   selectedCover = '';
