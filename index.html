@@ -63,7 +63,7 @@ textarea.modal-input { resize:vertical; }
 .btn-search { background:var(--pink-400); color:white; border:none; padding:8px 16px; border-radius:10px; font-size:13px; cursor:pointer; flex-shrink:0; }
 .modal-overlay { display:none; position:fixed; inset:0; background:rgba(60,10,30,0.4); z-index:200; align-items:flex-end; justify-content:center; }
 .modal-overlay.open { display:flex; }
-.modal { background:var(--card); border-radius:24px 24px 0 0; padding:20px 18px 36px; width:100%; max-width:480px; height:92vh; overflow-y:auto; }
+.modal { background:var(--card); border-radius:24px 24px 0 0; padding:20px 18px 36px; width:100%; max-width:480px; max-height:92vh; overflow-y:auto; }
 .modal-handle { width:36px; height:4px; background:var(--pink-100); border-radius:2px; margin:0 auto 16px; }
 .modal-title { font-size:16px; font-weight:600; color:var(--text); margin-bottom:16px; }
 .rating-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
@@ -74,6 +74,10 @@ textarea.modal-input { resize:vertical; }
 .status-pills { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
 .status-pill { padding:6px 14px; border-radius:20px; font-size:12px; cursor:pointer; border:0.5px solid var(--border); background:var(--bg); color:var(--muted); transition:all 0.15s; user-select:none; }
 .status-pill.active { background:var(--pink-400); color:white; border-color:var(--pink-400); }
+.genre-pill { padding:5px 12px; border-radius:20px; font-size:12px; cursor:pointer; border:0.5px solid var(--pink-100); background:var(--pink-50); color:var(--pink-600); transition:all 0.15s; user-select:none; }
+.genre-pill.active { background:var(--pink-600); color:white; border-color:var(--pink-600); }
+.trope-pill { padding:4px 10px; border-radius:20px; font-size:11px; cursor:pointer; border:0.5px solid var(--pink-100); background:var(--pink-50); color:var(--pink-600); transition:all 0.15s; user-select:none; }
+.trope-pill.active { background:var(--pink-400); color:white; border-color:var(--pink-400); }
 .recommend-row { display:flex; gap:10px; align-items:center; margin:12px 0; }
 .rec-btn { padding:7px 18px; border-radius:20px; font-size:13px; cursor:pointer; border:0.5px solid var(--border); background:var(--bg); color:var(--muted); transition:all 0.15s; }
 .rec-btn.active { background:var(--pink-400); color:white; border-color:var(--pink-400); }
@@ -239,7 +243,7 @@ textarea.modal-input { resize:vertical; }
         </div>
         <button class="btn-search" id="btn-modal-search-go" style="font-size:12px;">Buscar</button>
       </div>
-      <div id="modal-search-results" style="max-height:280px;overflow-y:auto;margin-bottom:10px;"></div>
+      <div id="modal-search-results" style="max-height:45vh;overflow-y:auto;margin-bottom:10px;"></div>
       <button id="btn-modal-manual" style="width:100%;padding:12px;border-radius:14px;border:1.5px dashed var(--pink-200);background:var(--pink-50);color:var(--pink-600);font-size:13px;cursor:pointer;display:none;">
         ✏️ No encontré mi libro, agregar manualmente
       </button>
@@ -250,12 +254,16 @@ textarea.modal-input { resize:vertical; }
       <div id="modal-book-preview" style="display:flex;gap:12px;align-items:center;background:var(--pink-50);border-radius:12px;padding:10px;margin-bottom:14px;"></div>
       <div class="form-group"><label>Título</label><input type="text" id="modal-titulo" class="modal-input" placeholder="título del libro"></div>
       <div class="form-group"><label>Autor</label><input type="text" id="modal-autor" class="modal-input" placeholder="autor"></div>
-      <div class="form-group"><label>Género</label><input type="text" id="modal-genero" class="modal-input" placeholder="ej: romance, fantasía..."></div>
+      <input type="hidden" id="modal-genero">
       <div class="form-group">
-        <label>Tropes / etiquetas <span style="font-weight:400;color:var(--muted);">(opcionales)</span></label>
-        <div id="modal-tags-sugeridos" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;"></div>
+        <label>Género</label>
+        <div id="genre-pills" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;"></div>
+      </div>
+      <div class="form-group">
+        <label>Tropes <span style="font-weight:400;color:var(--muted);">— tocá para agregar</span></label>
+        <div id="modal-tags-sugeridos" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;margin-top:4px;"></div>
         <div id="modal-tags-seleccionados" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;"></div>
-        <input type="text" id="modal-tag-custom" class="modal-input" placeholder="agregar trope personalizado..." style="font-size:13px;">
+        <input type="text" id="modal-tag-custom" class="modal-input" placeholder="trope personalizado + Enter" style="font-size:13px;">
       </div>
     <div style="margin-bottom:12px;">
       <div style="font-size:12px;color:var(--muted);margin-bottom:8px;font-weight:500;">Estado</div>
@@ -575,6 +583,7 @@ function resetModal() {
   currentStatus = 'tbr'; currentRec = null; selectedCover = '';
   ratings = {general:0,spice:0,fluff:0,llorar:0,humor:0,plot:0,mundo:0};
   selectedTags = [];
+  selectedGenero = '';
   document.getElementById('modal-titulo').value = '';
   document.getElementById('modal-autor').value = '';
   document.getElementById('modal-genero').value = '';
@@ -589,12 +598,14 @@ function openAddModal() {
   resetModal();
   document.getElementById('modal-title').textContent = 'Agregar libro';
   document.getElementById('btn-delete').style.display = 'none';
+  renderGenrePills(); renderTagSuggestions();
   document.getElementById('modal-search-input').value = '';
   document.getElementById('modal-search-results').innerHTML = '';
   document.getElementById('btn-modal-manual').style.display = 'none';
   document.getElementById('modal-book-preview').style.display = 'none';
   showModalStep('search');
   document.getElementById('book-modal').classList.add('open');
+  renderGenrePills(); renderTagSuggestions(); renderTags();
   setTimeout(() => document.getElementById('modal-search-input').focus(), 100);
 }
 
@@ -607,10 +618,10 @@ function openEditModal(id) {
   document.getElementById('modal-title').textContent = 'Editar libro';
   document.getElementById('modal-titulo').value = b.titulo||'';
   document.getElementById('modal-autor').value = b.autor||'';
-  document.getElementById('modal-genero').value = b.genero||'';
+  selectedGenero = b.genero||'';
+  document.getElementById('modal-genero').value = selectedGenero;
   selectedTags = b.tags ? [...b.tags] : [];
-  renderTags();
-  renderTagSuggestions(b.genero||'');
+  renderGenrePills(); renderTags(); renderTagSuggestions();
   document.getElementById('modal-resena').value = b.resena||'';
   document.getElementById('btn-delete').style.display = 'block';
   document.querySelectorAll('.status-pill').forEach(p=>p.classList.toggle('active', p.dataset.status===currentStatus));
@@ -716,62 +727,97 @@ function showModalStep(step) {
   document.getElementById('modal-step-form').style.display = step === 'form' ? 'block' : 'none';
 }
 
+const GENEROS = [
+  {id:'romance',     label:'💕 Romance'},
+  {id:'fantasy',     label:'🧙 Fantasía'},
+  {id:'new adult',   label:'✨ New Adult'},
+  {id:'ya',          label:'🌟 Young Adult'},
+  {id:'thriller',    label:'🔪 Thriller'},
+  {id:'mystery',     label:'🔍 Misterio'},
+  {id:'sci-fi',      label:'🚀 Ciencia Ficción'},
+  {id:'horror',      label:'👻 Horror'},
+  {id:'historical',  label:'🏰 Histórico'},
+  {id:'contemporary',label:'🌆 Contemporáneo'},
+  {id:'dark romance',label:'🖤 Dark Romance'},
+  {id:'paranormal',  label:'🌙 Paranormal'},
+  {id:'literary',    label:'📖 Literatura'},
+  {id:'nonfiction',  label:'📚 No Ficción'},
+];
+
 const TROPES_POR_GENERO = {
-  'romance': ['enemies to lovers','slow burn','second chance','forced proximity','love triangle','fake dating','friends to lovers','forbidden love','grumpy x sunshine','age gap'],
-  'fantasy': ['chosen one','magic system','found family','quest','prophecy','dark academia','fae','dragons','enemies to lovers','slow burn'],
-  'thriller': ['unreliable narrator','twist ending','whodunit','psychological','cat and mouse','conspiracy','dark secrets'],
-  'mystery': ['whodunit','detective','cold case','unreliable narrator','small town','cozy mystery'],
-  'sci-fi': ['dystopia','space opera','time travel','ai','post-apocalyptic','first contact','found family'],
-  'ya': ['coming of age','first love','chosen one','found family','school setting','forbidden love'],
-  'new adult': ['college','slow burn','enemies to lovers','friends to lovers','forced proximity','second chance'],
-  'horror': ['haunted house','psychological','supernatural','survival','dark atmosphere'],
+  'romance':      ['enemies to lovers','slow burn','second chance','forced proximity','love triangle','fake dating','friends to lovers','forbidden love','grumpy x sunshine','age gap','one bed','miscommunication','unrequited love','amnesia','bodyguard','celebrity','small town','office romance'],
+  'fantasy':      ['chosen one','magic system','found family','quest','prophecy','dark academia','fae','dragons','enemies to lovers','slow burn','political intrigue','heist','school of magic','anti-hero','morally grey','portal fantasy','revenge'],
+  'new adult':    ['college','slow burn','enemies to lovers','friends to lovers','forced proximity','second chance','forbidden love','sports romance','grumpy x sunshine','roommates','one bed','road trip'],
+  'ya':           ['coming of age','first love','chosen one','found family','school setting','forbidden love','enemies to lovers','self-discovery','social issues','dystopia'],
+  'thriller':     ['unreliable narrator','twist ending','whodunit','psychological','cat and mouse','conspiracy','dark secrets','missing person','stalker','gaslighting','race against time'],
+  'mystery':      ['whodunit','detective','cold case','unreliable narrator','small town','cozy mystery','locked room','amateur sleuth','procedural','historical mystery'],
+  'sci-fi':       ['dystopia','space opera','time travel','ai','post-apocalyptic','first contact','found family','clones','virtual reality','alien invasion','colonization'],
+  'horror':       ['haunted house','psychological','supernatural','survival','dark atmosphere','monster','possession','cult','body horror','slow burn dread'],
+  'historical':   ['enemies to lovers','forbidden love','arranged marriage','class divide','war','royalty','slow burn','secret identity','political intrigue'],
+  'contemporary': ['slice of life','found family','mental health','self-discovery','grief','humor','road trip','coming of age','small town'],
+  'dark romance': ['dubcon','anti-hero','morally grey','obsessive love','forbidden','mafia','age gap','dark themes','possessive love interest'],
+  'paranormal':   ['vampires','werewolves','witches','fated mates','supernatural powers','hidden world','enemies to lovers','forbidden love'],
+  'literary':     ['unreliable narrator','stream of consciousness','social commentary','coming of age','tragedy','character study','historical'],
+  'nonfiction':   ['memoir','self-help','true crime','biography','essays','history','science'],
 };
 
 let selectedTags = [];
+let selectedGenero = '';
+
+function renderGenrePills() {
+  const el = document.getElementById('genre-pills');
+  el.innerHTML = GENEROS.map(g =>
+    `<span class="status-pill ${selectedGenero===g.id?'active':''}" data-genre="${g.id}" style="font-size:12px;">${g.label}</span>`
+  ).join('');
+  el.querySelectorAll('.status-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      selectedGenero = pill.dataset.genre;
+      document.getElementById('modal-genero').value = selectedGenero;
+      renderGenrePills();
+      renderTagSuggestions();
+    });
+  });
+}
 
 function renderTags() {
   const selEl = document.getElementById('modal-tags-seleccionados');
-  selEl.innerHTML = selectedTags.map(t =>
-    `<span style="padding:4px 10px;border-radius:20px;background:var(--pink-400);color:white;font-size:11px;cursor:pointer;" data-tag="${escHtml(t)}">${escHtml(t)} ✕</span>`
-  ).join('');
-  selEl.querySelectorAll('span').forEach(el => {
+  if (selectedTags.length === 0) { selEl.innerHTML = ''; return; }
+  selEl.innerHTML = '<div style="font-size:11px;color:var(--muted);width:100%;margin-bottom:4px;">agregados:</div>' +
+    selectedTags.map(t =>
+      `<span style="padding:4px 10px;border-radius:20px;background:var(--pink-400);color:white;font-size:11px;cursor:pointer;" data-tag="${escHtml(t)}">${escHtml(t)} ✕</span>`
+    ).join('');
+  selEl.querySelectorAll('span[data-tag]').forEach(el => {
     el.addEventListener('click', () => {
       selectedTags = selectedTags.filter(t => t !== el.dataset.tag);
-      renderTags();
-      renderTagSuggestions(document.getElementById('modal-genero').value);
+      renderTags(); renderTagSuggestions();
     });
   });
 }
 
-function renderTagSuggestions(genero) {
-  const g = (genero||'').toLowerCase().trim();
+function renderTagSuggestions() {
   const sugEl = document.getElementById('modal-tags-sugeridos');
-  let sugeridos = [];
-  for (const [key, tags] of Object.entries(TROPES_POR_GENERO)) {
-    if (g.includes(key)) { sugeridos = tags; break; }
-  }
+  const sugeridos = TROPES_POR_GENERO[selectedGenero] || [];
   const disponibles = sugeridos.filter(t => !selectedTags.includes(t));
-  if (disponibles.length === 0) { sugEl.innerHTML = ''; return; }
-  sugEl.innerHTML = '<div style="font-size:11px;color:var(--muted);width:100%;margin-bottom:2px;">sugeridos:</div>' +
-    disponibles.slice(0,8).map(t =>
-      `<span style="padding:4px 10px;border-radius:20px;background:var(--pink-50);color:var(--pink-600);font-size:11px;cursor:pointer;border:0.5px solid var(--pink-100);" data-tag="${escHtml(t)}">${escHtml(t)} +</span>`
-    ).join('');
+  if (disponibles.length === 0) {
+    sugEl.innerHTML = selectedGenero ? '<div style="font-size:11px;color:var(--muted);">¡Ya agregaste todos los tropes sugeridos!</div>' : '<div style="font-size:11px;color:var(--muted);">Seleccioná un género para ver tropes sugeridos.</div>';
+    return;
+  }
+  sugEl.innerHTML = disponibles.map(t =>
+    `<span style="padding:4px 10px;border-radius:20px;background:var(--pink-50);color:var(--pink-600);font-size:11px;cursor:pointer;border:0.5px solid var(--pink-100);" data-tag="${escHtml(t)}">${escHtml(t)} +</span>`
+  ).join('');
   sugEl.querySelectorAll('span[data-tag]').forEach(el => {
     el.addEventListener('click', () => {
       if (!selectedTags.includes(el.dataset.tag)) selectedTags.push(el.dataset.tag);
-      renderTags();
-      renderTagSuggestions(document.getElementById('modal-genero').value);
+      renderTags(); renderTagSuggestions();
     });
   });
 }
-
-document.getElementById('modal-genero').addEventListener('input', e => renderTagSuggestions(e.target.value));
 
 document.getElementById('modal-tag-custom').addEventListener('keydown', e => {
   if (e.key === 'Enter' || e.key === ',') {
     e.preventDefault();
     const val = e.target.value.trim().replace(/,$/, '');
-    if (val && !selectedTags.includes(val)) { selectedTags.push(val); renderTags(); renderTagSuggestions(document.getElementById('modal-genero').value); }
+    if (val && !selectedTags.includes(val)) { selectedTags.push(val); renderTags(); renderTagSuggestions(); }
     e.target.value = '';
   }
 });
@@ -783,10 +829,12 @@ function fillModalFromBook(info) {
   // Auto-fill genre from Google Books categories
   const cats = info.categories || [];
   if (cats.length > 0) {
-    const genero = cats[0].split('/')[0].trim().toLowerCase();
-    document.getElementById('modal-genero').value = genero;
-    renderTagSuggestions(genero);
+    const raw = cats[0].split('/')[0].trim().toLowerCase();
+    const match = GENEROS.find(g => raw.includes(g.id) || g.id.includes(raw));
+    if (match) { selectedGenero = match.id; document.getElementById('modal-genero').value = match.id; }
   }
+  renderGenrePills();
+  renderTagSuggestions();
   const preview = document.getElementById('modal-book-preview');
   preview.innerHTML = selectedCover
     ? `<img src="${selectedCover}" style="width:44px;height:62px;border-radius:6px;object-fit:cover;flex-shrink:0;">
@@ -877,6 +925,7 @@ document.getElementById('btn-modal-search-go').addEventListener('click', doModal
 document.getElementById('modal-search-input').addEventListener('keydown', e => { if(e.key==='Enter') doModalSearch(); });
 document.getElementById('btn-modal-manual').addEventListener('click', () => {
   selectedTags = [];
+  selectedGenero = '';
   document.getElementById('modal-titulo').value = '';
   document.getElementById('modal-autor').value = '';
   selectedCover = '';
