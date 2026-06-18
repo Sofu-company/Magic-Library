@@ -835,21 +835,46 @@ document.getElementById('modal-tag-custom').addEventListener('keydown', e => {
   }
 });
 
-function fillModalFromBook(info) {
+async function analyzeBookWithAI(info) {
+  const generoIds = GENEROS.map(g => g.id).join(', ');
+  const tropesList = [...new Set(Object.values(TROPES_POR_GENERO).flat())].join(', ');
+  const descripcion = info.description ? info.description.replace(/<[^>]+>/g,'').substring(0, 800) : '';
+  const prompt = `Analizá este libro y respondé SOLO con JSON, sin texto extra, sin markdown:
+Título: ${info.title}
+Autor: ${info.authors?.[0] || 'desconocido'}
+Descripción: ${descripcion || 'no disponible'}
+
+Géneros disponibles: ${generoIds}
+Tropes disponibles: ${tropesList}
+
+Respondé exactamente así:
+{"generos":["id1","id2"],"tropes":["trope1","trope2","trope3"]}
+
+Elegí máximo 3 géneros y máximo 6 tropes que mejor describan el libro. Solo usá valores de las listas dadas.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 200,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.[0]?.text || '';
+    const clean = text.replace(/```json|```/g,'').trim();
+    return JSON.parse(clean);
+  } catch(e) { return null; }
+}
+
+async function fillModalFromBook(info) {
   selectedCover = info.imageLinks?.thumbnail || '';
   document.getElementById('modal-titulo').value = info.title || '';
   document.getElementById('modal-autor').value = info.authors?.[0] || '';
-  // Auto-fill genres from Google Books categories
-  const cats = info.categories || [];
-  selectedGeneros = [];
-  cats.forEach(cat => {
-    const raw = cat.split('/')[0].trim().toLowerCase();
-    const match = GENEROS.find(g => raw.includes(g.id) || g.id.includes(raw));
-    if (match && !selectedGeneros.includes(match.id)) selectedGeneros.push(match.id);
-  });
-  document.getElementById('modal-genero').value = selectedGeneros.join(',');
-  renderGenrePills();
-  renderTagSuggestions();
+
+  // Show preview and form immediately
   const preview = document.getElementById('modal-book-preview');
   preview.innerHTML = selectedCover
     ? `<img src="${selectedCover}" style="width:44px;height:62px;border-radius:6px;object-fit:cover;flex-shrink:0;">
@@ -860,7 +885,38 @@ function fillModalFromBook(info) {
        <button id="btn-back-search" style="font-size:12px;color:var(--pink-400);background:none;border:none;cursor:pointer;margin-top:4px;">← cambiar libro</button></div>`;
   preview.style.display = 'flex';
   document.getElementById('btn-back-search')?.addEventListener('click', () => showModalStep('search'));
+
+  // Show loading state for genres/tropes
+  selectedGeneros = [];
+  selectedTags = [];
+  renderGenrePills();
+  document.getElementById('modal-tags-sugeridos').innerHTML = '<div style="font-size:12px;color:var(--muted);padding:8px 0;">🔍 Analizando géneros y tropes con IA...</div>';
+  document.getElementById('modal-tags-seleccionados').innerHTML = '';
   showModalStep('form');
+
+  // Try Google Books categories first
+  const cats = info.categories || [];
+  cats.forEach(cat => {
+    const raw = cat.split('/')[0].trim().toLowerCase();
+    const match = GENEROS.find(g => raw.includes(g.id) || g.id.includes(raw));
+    if (match && !selectedGeneros.includes(match.id)) selectedGeneros.push(match.id);
+  });
+
+  // Analyze with AI
+  const aiResult = await analyzeBookWithAI(info);
+  if (aiResult) {
+    // Merge AI genres with Google Books genres
+    (aiResult.generos || []).forEach(g => {
+      if (GENEROS.find(x => x.id === g) && !selectedGeneros.includes(g)) selectedGeneros.push(g);
+    });
+    // Set AI-suggested tropes as selected
+    selectedTags = (aiResult.tropes || []).filter(t => t && t.length > 0);
+  }
+
+  document.getElementById('modal-genero').value = selectedGeneros.join(',');
+  renderGenrePills();
+  renderTags();
+  renderTagSuggestions();
 }
 
 function renderSearchResults() {
