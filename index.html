@@ -274,7 +274,31 @@ textarea.modal-input { resize:vertical; }
         <div class="status-pill" data-status="leyendo">📖 Leyendo</div>
         <div class="status-pill" data-status="leido">✅ Leído</div>
         <div class="status-pill" data-status="abandonado">❌ Abandonado</div>
+        <div class="status-pill" data-status="releyendo">🔄 Releyendo</div>
       </div>
+    </div>
+    <div id="fechas-section" style="display:none;margin-bottom:12px;">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:8px;font-weight:500;">Fechas</div>
+      <div style="display:flex;gap:8px;">
+        <div class="form-group" style="flex:1;margin-bottom:0;">
+          <label>Inicio</label>
+          <input type="date" id="modal-fecha-inicio" class="modal-input" style="font-size:13px;">
+        </div>
+        <div class="form-group" id="fecha-fin-group" style="flex:1;margin-bottom:0;display:none;">
+          <label>Finalización</label>
+          <input type="date" id="modal-fecha-fin" class="modal-input" style="font-size:13px;">
+        </div>
+      </div>
+    </div>
+    <div id="relecturas-section" style="display:none;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="font-size:12px;color:var(--muted);font-weight:500;">Historial de lecturas</div>
+        <span id="relecturas-count" style="font-size:12px;color:var(--pink-600);font-weight:500;"></span>
+      </div>
+      <div id="relecturas-list" style="margin-top:8px;font-size:12px;color:var(--muted);"></div>
+      <button id="btn-volver-leer" type="button" style="width:100%;margin-top:8px;padding:9px;border-radius:10px;border:1px dashed var(--pink-200);background:var(--pink-50);color:var(--pink-600);font-size:12px;cursor:pointer;display:none;">
+        🔄 Volver a leer (nueva relectura)
+      </button>
     </div>
     <div id="rating-section" style="display:none;">
       <div style="font-size:12px;color:var(--muted);margin-bottom:10px;font-weight:500;">Calificaciones</div>
@@ -342,12 +366,13 @@ const db = getFirestore(fbApp);
 
 let currentUser = null, books = [], editingBookId = null;
 let currentStatus = 'tbr', currentRec = null;
+let currentFechaInicio = '', currentFechaFin = '', currentRelecturas = [];
 let ratings = {general:0,spice:0,fluff:0,llorar:0,humor:0,plot:0,mundo:0};
 let userGoal = 30, selectedCover = '';
 
 const RATING_EMOJIS = {general:'⭐',spice:'🌶️',fluff:'🩷',llorar:'😭',humor:'😂',plot:'🎭',mundo:'🌍'};
 const RATING_KEYS = ['general','spice','fluff','llorar','humor','plot','mundo'];
-const STATUS_LABELS = {tbr:'📚 Por leer',leyendo:'📖 Leyendo',leido:'✅ Leído',abandonado:'❌ Abandonado'};
+const STATUS_LABELS = {tbr:'📚 Por leer',leyendo:'📖 Leyendo',leido:'✅ Leído',abandonado:'❌ Abandonado',releyendo:'🔄 Releyendo'};
 const COVER_COLORS = ['#D4537E','#ED93B1','#993556','#c96b90','#72243E','#E8749A','#B83A6A','#F0A0C0'];
 
 function showToast(msg) {
@@ -464,6 +489,8 @@ function bookCardHTML(b) {
       <div class="book-author">${escHtml(b.autor||'')}</div>
       <span class="book-badge">${STATUS_LABELS[b.status]||b.status}</span>
       ${b.ratings&&b.ratings.general?`<div class="book-stars">${'⭐'.repeat(b.ratings.general)}</div>`:''}
+      ${b.relecturas&&b.relecturas.length>1?`<div style="font-size:10px;color:var(--muted);margin-top:2px;">🔄 ${b.relecturas.length} lecturas</div>`:''}
+      ${b.fechaLeido?`<div style="font-size:10px;color:var(--muted);margin-top:1px;">📅 ${b.fechaLeido}</div>`:''}
     </div>
   </div>`;
 }
@@ -555,6 +582,9 @@ function renderRatings() {
           ${b.ratings.spice?'🌶️'.repeat(b.ratings.spice):''} ${b.ratings.fluff?'🩷'.repeat(b.ratings.fluff):''}
           ${b.recomendado===true?' · 👍':b.recomendado===false?' · 👎':''}
         </div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px;">
+          ${b.fechaLeido?`📅 ${b.fechaLeido}`:''}${b.relecturas&&b.relecturas.length>1?` · 🔄 leído ${b.relecturas.length} veces`:''}
+        </div>
       </div>
     </div>`).join('');
   attachCardClicks(el);
@@ -584,9 +614,14 @@ function renderMeta() {
 function resetModal() {
   currentStatus = 'tbr'; currentRec = null; selectedCover = '';
   ratings = {general:0,spice:0,fluff:0,llorar:0,humor:0,plot:0,mundo:0};
-  selectedTags = [];
-  selectedGeneros = [];
+  selectedTags = []; selectedGeneros = [];
+  currentFechaInicio = ''; currentFechaFin = ''; currentRelecturas = [];
   document.getElementById('modal-titulo').value = '';
+  document.getElementById('modal-fecha-inicio').value = '';
+  document.getElementById('modal-fecha-fin').value = '';
+  document.getElementById('fechas-section').style.display = 'none';
+  document.getElementById('fecha-fin-group').style.display = 'none';
+  document.getElementById('relecturas-section').style.display = 'none';
   document.getElementById('modal-autor').value = '';
   document.getElementById('modal-genero').value = '';
   document.getElementById('modal-resena').value = '';
@@ -620,11 +655,20 @@ function openEditModal(id) {
   document.getElementById('modal-title').textContent = 'Editar libro';
   document.getElementById('modal-titulo').value = b.titulo||'';
   document.getElementById('modal-autor').value = b.autor||'';
-  selectedGenero = b.genero||'';
-  document.getElementById('modal-genero').value = selectedGenero;
+  selectedGeneros = b.genero ? b.genero.split(',').map(g=>g.trim()).filter(Boolean) : [];
+  document.getElementById('modal-genero').value = b.genero || '';
   selectedTags = b.tags ? [...b.tags] : [];
   renderGenrePills(); renderTags(); renderTagSuggestions();
   document.getElementById('modal-resena').value = b.resena||'';
+  currentFechaInicio = b.fechaInicio || '';
+  currentFechaFin = b.fechaLeido || '';
+  currentRelecturas = b.relecturas ? [...b.relecturas] : [];
+  document.getElementById('modal-fecha-inicio').value = currentFechaInicio;
+  document.getElementById('modal-fecha-fin').value = currentFechaFin;
+  const showFechas = b.status !== 'tbr';
+  document.getElementById('fechas-section').style.display = showFechas ? 'block' : 'none';
+  document.getElementById('fecha-fin-group').style.display = (b.status==='leido'||b.status==='abandonado') ? 'block' : 'none';
+  updateRelecturasSection();
   document.getElementById('btn-delete').style.display = 'block';
   document.querySelectorAll('.status-pill').forEach(p=>p.classList.toggle('active', p.dataset.status===currentStatus));
   document.getElementById('rating-section').style.display = currentStatus==='leido' ? 'block' : 'none';
@@ -669,16 +713,79 @@ document.getElementById('status-pills').addEventListener('click', e => {
   currentStatus = pill.dataset.status;
   document.querySelectorAll('.status-pill').forEach(p=>p.classList.remove('active'));
   pill.classList.add('active');
-  document.getElementById('rating-section').style.display = currentStatus==='leido' ? 'block' : 'none';
+  document.getElementById('rating-section').style.display = (currentStatus==='leido'||currentStatus==='releyendo') ? 'block' : 'none';
+  // Show date fields for leyendo, leido, releyendo, abandonado
+  const showFechas = currentStatus !== 'tbr';
+  document.getElementById('fechas-section').style.display = showFechas ? 'block' : 'none';
+  document.getElementById('fecha-fin-group').style.display = (currentStatus==='leido'||currentStatus==='abandonado') ? 'block' : 'none';
+  // Show relecturas for releyendo
+  updateRelecturasSection();
 });
 
 document.getElementById('btn-fab').addEventListener('click', openAddModal);
 document.getElementById('btn-modal-cancel').addEventListener('click', closeBookModal);
 document.getElementById('book-modal').addEventListener('click', e => { if(e.target.id==='book-modal') closeBookModal(); });
 
+function updateRelecturasSection() {
+  const el = document.getElementById('relecturas-section');
+  const list = document.getElementById('relecturas-list');
+  const count = document.getElementById('relecturas-count');
+  const volverBtn = document.getElementById('btn-volver-leer');
+  if (currentStatus === 'leido' || currentStatus === 'releyendo') {
+    el.style.display = 'block';
+    const total = currentRelecturas.length;
+    count.textContent = total > 0 ? `${total} lectura${total>1?'s':''} registrada${total>1?'s':''}` : '';
+    list.innerHTML = currentRelecturas.length === 0
+      ? '<div style="color:var(--muted);font-size:12px;">Esta va a ser tu primera lectura registrada.</div>'
+      : currentRelecturas.map((r,i) => `
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:0.5px solid var(--border);">
+            <span>📖 Lectura ${i+1}${r.inicio?' · '+r.inicio:''}${r.fin?' → '+r.fin:''}</span>
+            <button data-i="${i}" style="font-size:11px;color:#c0392b;background:none;border:none;cursor:pointer;">✕</button>
+          </div>`).join('');
+    list.querySelectorAll('button[data-i]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentRelecturas.splice(parseInt(btn.dataset.i), 1);
+        updateRelecturasSection();
+      });
+    });
+    volverBtn.style.display = (currentStatus === 'leido' && total > 0) ? 'block' : 'none';
+  } else {
+    el.style.display = 'none';
+    volverBtn.style.display = 'none';
+  }
+}
+
+document.getElementById('btn-volver-leer').addEventListener('click', () => {
+  currentStatus = 'leyendo';
+  document.querySelectorAll('.status-pill').forEach(p=>p.classList.toggle('active', p.dataset.status==='leyendo'));
+  document.getElementById('rating-section').style.display = 'none';
+  document.getElementById('fechas-section').style.display = 'block';
+  document.getElementById('fecha-fin-group').style.display = 'none';
+  document.getElementById('modal-fecha-inicio').value = '';
+  document.getElementById('modal-fecha-fin').value = '';
+  showToast('Marcado como "Leyendo" — completá la fecha de inicio 📖');
+  updateRelecturasSection();
+});
+
 document.getElementById('btn-modal-save').addEventListener('click', async () => {
   const titulo = document.getElementById('modal-titulo').value.trim();
   if(!titulo) { showToast('Poné el título del libro 📚'); return; }
+  // Handle relecturas: when marking as leido, save the reading session
+  let relecturasToSave = [...currentRelecturas];
+  const existingBook = editingBookId ? books.find(b=>b.id===editingBookId) : null;
+  if (currentStatus === 'leido') {
+    const inicio = document.getElementById('modal-fecha-inicio').value;
+    const fin = document.getElementById('modal-fecha-fin').value;
+    const yaEstabaLeido = existingBook?.status === 'leido';
+    if (!yaEstabaLeido) {
+      // New completed read session (covers tbr→leido, leyendo→leido, releyendo→leido)
+      relecturasToSave.push({ inicio: inicio || null, fin: fin || new Date().toISOString().split('T')[0], fecha: new Date().toISOString() });
+    } else if (relecturasToSave.length > 0) {
+      // Just editing dates of an already-finished book
+      if (inicio) relecturasToSave[relecturasToSave.length-1].inicio = inicio;
+      if (fin) relecturasToSave[relecturasToSave.length-1].fin = fin;
+    }
+  }
   const data = {
     uid: currentUser.uid, titulo,
     autor: document.getElementById('modal-autor').value.trim(),
@@ -687,10 +794,12 @@ document.getElementById('btn-modal-save').addEventListener('click', async () => 
     status: currentStatus,
     cover: selectedCover,
     color: colorForTitle(titulo),
-    ratings: currentStatus==='leido' ? {...ratings} : {},
+    ratings: (currentStatus==='leido'||currentStatus==='releyendo') ? {...ratings} : {},
     recomendado: currentRec,
     resena: document.getElementById('modal-resena').value.trim(),
-    fechaLeido: currentStatus==='leido' ? (editingBookId ? (books.find(b=>b.id===editingBookId)?.fechaLeido || new Date().toISOString()) : new Date().toISOString()) : null,
+    fechaInicio: document.getElementById('modal-fecha-inicio').value || null,
+    fechaLeido: currentStatus==='leido' ? (document.getElementById('modal-fecha-fin').value || new Date().toISOString().split('T')[0]) : null,
+    relecturas: relecturasToSave,
     updatedAt: new Date().toISOString(),
   };
   try {
@@ -879,12 +988,17 @@ function renderSearchResults() {
     const autor = info.authors?.[0] || '';
     const anio = info.publishedDate ? info.publishedDate.substring(0,4) : '';
     const globalI = searchPage * PAGE_SIZE + i;
-    return `<div class="book-card" data-i="${globalI}" style="padding:10px;">
+    // Check if already in library
+    const inLib = books.find(b => b.titulo.toLowerCase() === (info.title||'').toLowerCase());
+    const badge = inLib
+      ? `<span class="book-badge" style="background:var(--pink-50);color:var(--pink-600);">${STATUS_LABELS[inLib.status]||inLib.status} · ver</span>`
+      : `<span class="book-badge" style="background:var(--pink-400);color:white;border-color:var(--pink-400);">+ agregar</span>`;
+    return `<div class="book-card" data-i="${globalI}" style="padding:10px;${inLib?'opacity:0.85;':''}">
       <div class="book-cover" style="width:44px;height:62px;font-size:7px;">${cover ? `<img src="${cover}" alt="">` : escHtml((info.title||'').substring(0,8))}</div>
       <div class="book-info">
         <div class="book-title">${escHtml(info.title||'')}</div>
         <div class="book-author">${escHtml(autor)}${anio ? ' · ' + anio : ''}</div>
-        <span class="book-badge" style="background:var(--pink-400);color:white;border-color:var(--pink-400);">+ agregar</span>
+        ${badge}
       </div>
     </div>`;
   }).join('');
@@ -900,7 +1014,15 @@ function renderSearchResults() {
 
   resultsEl.querySelectorAll('.book-card').forEach(card => {
     const i = parseInt(card.dataset.i);
-    card.addEventListener('click', () => fillModalFromBook(lastSearchItems[i].volumeInfo));
+    card.addEventListener('click', () => {
+      const info = lastSearchItems[i].volumeInfo;
+      const inLib = books.find(b => b.titulo.toLowerCase() === (info.title||'').toLowerCase());
+      if (inLib) {
+        openEditModal(inLib.id);
+      } else {
+        fillModalFromBook(info);
+      }
+    });
   });
 
   if (totalPages > 1) {
@@ -943,9 +1065,14 @@ async function doModalSearch() {
 document.getElementById('btn-modal-search-go').addEventListener('click', doModalSearch);
 document.getElementById('modal-search-input').addEventListener('keydown', e => { if(e.key==='Enter') doModalSearch(); });
 document.getElementById('btn-modal-manual').addEventListener('click', () => {
-  selectedTags = [];
-  selectedGeneros = [];
+  selectedTags = []; selectedGeneros = [];
+  currentFechaInicio = ''; currentFechaFin = ''; currentRelecturas = [];
   document.getElementById('modal-titulo').value = '';
+  document.getElementById('modal-fecha-inicio').value = '';
+  document.getElementById('modal-fecha-fin').value = '';
+  document.getElementById('fechas-section').style.display = 'none';
+  document.getElementById('fecha-fin-group').style.display = 'none';
+  document.getElementById('relecturas-section').style.display = 'none';
   document.getElementById('modal-autor').value = '';
   selectedCover = '';
   document.getElementById('modal-book-preview').style.display = 'none';
