@@ -297,7 +297,7 @@ textarea.modal-input { resize:vertical; }
       </div>
       <div id="relecturas-list" style="margin-top:8px;font-size:12px;color:var(--muted);"></div>
       <button id="btn-volver-leer" type="button" style="width:100%;margin-top:8px;padding:9px;border-radius:10px;border:1px dashed var(--pink-200);background:var(--pink-50);color:var(--pink-600);font-size:12px;cursor:pointer;display:none;">
-        🔄 Volver a leer (nueva relectura)
+        🔄 Releer
       </button>
     </div>
     <div id="rating-section" style="display:none;">
@@ -678,11 +678,11 @@ function openEditModal(id) {
   buildRatingInputs(); updateRecButtons();
   selectedSinopsis = b.sinopsis || '';
   const preview = document.getElementById('modal-book-preview');
-  const verSinopsisBtnEdit = selectedSinopsis ? `<button id="btn-ver-sinopsis" style="font-size:12px;color:var(--pink-400);background:none;border:none;cursor:pointer;">📖 ver sinopsis</button>` : '';
-  if (selectedCover || selectedSinopsis) {
+  const verSinopsisBtnEdit = `<button id="btn-ver-sinopsis" style="font-size:12px;color:var(--pink-400);background:none;border:none;cursor:pointer;">📖 ver sinopsis</button>`;
+  if (selectedCover || true) {
     preview.innerHTML = `${selectedCover?`<img src="${selectedCover}" style="width:44px;height:62px;border-radius:6px;object-fit:cover;">`:''}${verSinopsisBtnEdit}`;
     preview.style.display = 'flex';
-    document.getElementById('btn-ver-sinopsis')?.addEventListener('click', () => showSinopsisModal(b.titulo||'', selectedSinopsis));
+    document.getElementById('btn-ver-sinopsis')?.addEventListener('click', () => showSinopsisModal(b.titulo||'', selectedSinopsis || 'Este libro no tiene sinopsis disponible.'));
   } else {
     preview.style.display = 'none';
   }
@@ -976,7 +976,7 @@ function fillModalFromBook(info) {
   renderTags();
   renderTagSuggestions();
 
-  const verSinopsisBtn = selectedSinopsis ? `<button id="btn-ver-sinopsis" style="font-size:12px;color:var(--pink-400);background:none;border:none;cursor:pointer;margin-top:4px;margin-left:8px;">📖 ver sinopsis</button>` : '';
+  const verSinopsisBtn = `<button id="btn-ver-sinopsis" style="font-size:12px;color:var(--pink-400);background:none;border:none;cursor:pointer;margin-top:4px;margin-left:8px;">📖 ver sinopsis</button>`;
   const preview = document.getElementById('modal-book-preview');
   preview.style.flexWrap = 'wrap';
   preview.innerHTML = selectedCover
@@ -988,7 +988,7 @@ function fillModalFromBook(info) {
        <button id="btn-back-search" style="font-size:12px;color:var(--pink-400);background:none;border:none;cursor:pointer;margin-top:4px;">← cambiar libro</button>${verSinopsisBtn}</div>`;
   preview.style.display = 'flex';
   document.getElementById('btn-back-search')?.addEventListener('click', () => showModalStep('search'));
-  document.getElementById('btn-ver-sinopsis')?.addEventListener('click', () => showSinopsisModal(info.title||'', selectedSinopsis));
+  document.getElementById('btn-ver-sinopsis')?.addEventListener('click', () => showSinopsisModal(info.title||'', selectedSinopsis || 'Este libro no tiene sinopsis disponible en Google Books.'));
   showModalStep('form');
 }
 
