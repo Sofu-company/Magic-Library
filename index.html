@@ -308,13 +308,17 @@ textarea.modal-input { resize:vertical; }
         <input type="hidden" id="modal-formato">
       </div>
       <div class="form-group">
-        <label>¿Es parte de una saga/serie?</label>
+        <label>¿Es parte de una colección?</label>
         <div id="saga-pills" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;margin-bottom:8px;">
           <span class="genre-pill active" data-saga-tipo="unico">📗 Libro único</span>
           <span class="genre-pill" data-saga-tipo="serie">📚 Forma parte de una colección</span>
         </div>
         <div id="saga-detalle" style="display:none;">
-          <input type="text" id="modal-saga-nombre" class="modal-input" placeholder="nombre de la saga/serie/trilogía..." style="margin-bottom:8px;">
+          <div class="search-bar" id="btn-elegir-coleccion" style="cursor:pointer;margin-bottom:8px;">
+            <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            <span id="coleccion-elegida-texto" style="color:var(--muted);">Elegir o crear colección...</span>
+          </div>
+          <input type="hidden" id="modal-saga-nombre">
           <input type="number" id="modal-saga-numero" class="modal-input" placeholder="número en la colección (ej: 1, 2, 3...)" min="1">
         </div>
       </div>
@@ -390,6 +394,25 @@ textarea.modal-input { resize:vertical; }
   </div>
 </div>
 
+<!-- MODAL ELEGIR COLECCIÓN -->
+<div class="modal-overlay" id="coleccion-modal" style="z-index:250;">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Elegir colección</div>
+    <div class="search-bar" style="margin-bottom:10px;">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="coleccion-buscar-input" placeholder="buscar colección...">
+    </div>
+    <div id="coleccion-lista" style="max-height:40vh;overflow-y:auto;margin-bottom:10px;"></div>
+    <button id="btn-crear-coleccion" style="width:100%;padding:12px;border-radius:14px;border:1.5px dashed var(--pink-200);background:var(--pink-50);color:var(--pink-600);font-size:13px;cursor:pointer;">
+      ✏️ Crear nueva colección
+    </button>
+    <div class="modal-actions">
+      <button class="btn-cancel" id="btn-coleccion-cancel">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL META -->
 <div class="modal-overlay" id="goal-modal">
   <div class="modal">
@@ -405,6 +428,7 @@ textarea.modal-input { resize:vertical; }
     </div>
   </div>
 </div>
+
 
 <div class="toast" id="toast"></div>
 
@@ -752,6 +776,62 @@ document.getElementById('saga-pills').addEventListener('click', e => {
   document.getElementById('saga-detalle').style.display = sagaTipo === 'serie' ? 'block' : 'none';
 });
 
+// ── PICKER DE COLECCIONES ──────────────────────────
+function getColeccionesExistentes() {
+  const nombres = new Set();
+  books.forEach(b => { if (b.sagaNombre && b.sagaNombre.trim()) nombres.add(b.sagaNombre.trim()); });
+  return [...nombres].sort();
+}
+
+function renderColeccionLista(filtro) {
+  const listaEl = document.getElementById('coleccion-lista');
+  const todas = getColeccionesExistentes();
+  const f = (filtro||'').toLowerCase().trim();
+  const filtradas = f ? todas.filter(n => n.toLowerCase().includes(f)) : todas;
+  if (filtradas.length === 0) {
+    listaEl.innerHTML = `<div style="font-size:13px;color:var(--muted);padding:12px 4px;">${todas.length===0 ? 'Todavía no tenés colecciones creadas.' : 'Sin resultados.'}</div>`;
+    return;
+  }
+  listaEl.innerHTML = filtradas.map(nombre => {
+    const count = books.filter(b => (b.sagaNombre||'').trim() === nombre).length;
+    return `<div class="book-card" data-nombre="${escHtml(nombre)}" style="padding:10px;">
+      <div class="book-cover" style="background:${colorForTitle(nombre)};width:38px;height:52px;display:flex;align-items:center;justify-content:center;font-size:18px;">📚</div>
+      <div class="book-info">
+        <div class="book-title">${escHtml(nombre)}</div>
+        <div class="book-author">${count} libro${count>1?'s':''}</div>
+      </div>
+    </div>`;
+  }).join('');
+  listaEl.querySelectorAll('.book-card[data-nombre]').forEach(card => {
+    card.addEventListener('click', () => elegirColeccion(card.dataset.nombre));
+  });
+}
+
+function elegirColeccion(nombre) {
+  document.getElementById('modal-saga-nombre').value = nombre;
+  document.getElementById('coleccion-elegida-texto').textContent = nombre;
+  document.getElementById('coleccion-elegida-texto').style.color = 'var(--text)';
+  document.getElementById('coleccion-modal').classList.remove('open');
+}
+
+document.getElementById('btn-elegir-coleccion').addEventListener('click', () => {
+  document.getElementById('coleccion-buscar-input').value = '';
+  renderColeccionLista('');
+  document.getElementById('coleccion-modal').classList.add('open');
+  setTimeout(() => document.getElementById('coleccion-buscar-input').focus(), 100);
+});
+
+document.getElementById('coleccion-buscar-input').addEventListener('input', e => renderColeccionLista(e.target.value));
+
+document.getElementById('btn-crear-coleccion').addEventListener('click', () => {
+  const nombre = document.getElementById('coleccion-buscar-input').value.trim();
+  if (!nombre) { showToast('Escribí el nombre de la nueva colección 📚'); return; }
+  elegirColeccion(nombre);
+});
+
+document.getElementById('btn-coleccion-cancel').addEventListener('click', () => document.getElementById('coleccion-modal').classList.remove('open'));
+document.getElementById('coleccion-modal').addEventListener('click', e => { if(e.target.id==='coleccion-modal') document.getElementById('coleccion-modal').classList.remove('open'); });
+
 function resetModal() {
   currentStatus = 'tbr'; currentRec = null; selectedCover = ''; selectedSinopsis = '';
   ratings = {general:0,spice:0,fluff:0,llorar:0,humor:0,plot:0,mundo:0};
@@ -776,6 +856,8 @@ function resetModal() {
   document.getElementById('saga-detalle').style.display = 'none';
   document.getElementById('modal-saga-nombre').value = '';
   document.getElementById('modal-saga-numero').value = '';
+  document.getElementById('coleccion-elegida-texto').textContent = 'Elegir o crear colección...';
+  document.getElementById('coleccion-elegida-texto').style.color = 'var(--muted)';
   document.querySelectorAll('.status-pill').forEach(p=>p.classList.toggle('active', p.dataset.status==='tbr'));
   document.getElementById('rating-section').style.display = 'none';
   buildRatingInputs(); updateRecButtons();
@@ -822,6 +904,8 @@ function openEditModal(id) {
   document.getElementById('saga-detalle').style.display = sagaTipo === 'serie' ? 'block' : 'none';
   document.getElementById('modal-saga-nombre').value = b.sagaNombre || '';
   document.getElementById('modal-saga-numero').value = b.sagaNumero || '';
+  document.getElementById('coleccion-elegida-texto').textContent = b.sagaNombre || 'Elegir o crear colección...';
+  document.getElementById('coleccion-elegida-texto').style.color = b.sagaNombre ? 'var(--text)' : 'var(--muted)';
   currentFechaInicio = b.fechaInicio || '';
   currentFechaFin = b.fechaLeido || '';
   currentRelecturas = b.relecturas ? [...b.relecturas] : [];
