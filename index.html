@@ -92,6 +92,13 @@ textarea.modal-input { resize:vertical; }
 .status-pill { padding:6px 14px; border-radius:20px; font-size:12px; cursor:pointer; border:0.5px solid var(--border); background:var(--bg); color:var(--muted); transition:all 0.15s; user-select:none; }
 .status-pill.active { background:var(--pink-400); color:white; border-color:var(--pink-400); }
 .genre-pill { padding:5px 12px; border-radius:20px; font-size:12px; cursor:pointer; border:0.5px solid var(--pink-100); background:var(--pink-50); color:var(--pink-600); transition:all 0.15s; user-select:none; }
+.coleccion-card { display:flex; gap:10px; align-items:center; background:var(--card); border:0.5px solid var(--border); border-radius:14px; padding:10px; cursor:pointer; transition:border-color 0.15s; }
+.coleccion-card:hover { border-color:var(--pink-200); }
+.coleccion-cover { width:38px; height:52px; border-radius:6px; flex-shrink:0; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.coleccion-cover img { width:100%; height:100%; object-fit:cover; }
+.coleccion-info { flex:1; min-width:0; }
+.coleccion-nombre { font-size:12px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.coleccion-meta { font-size:10px; color:var(--muted); margin-top:2px; }
 .genre-pill.active { background:var(--pink-600); color:white; border-color:var(--pink-600); }
 .trope-pill { padding:4px 10px; border-radius:20px; font-size:11px; cursor:pointer; border:0.5px solid var(--pink-100); background:var(--pink-50); color:var(--pink-600); transition:all 0.15s; user-select:none; }
 .trope-pill.active { background:var(--pink-400); color:white; border-color:var(--pink-400); }
@@ -187,7 +194,14 @@ textarea.modal-input { resize:vertical; }
   <div id="s-estanteria" class="screen">
     <div class="section-label">mi estantería</div>
     <div class="real-shelf" id="real-shelf"></div>
-    <div class="section-label" style="margin-top:16px;">todos mis libros</div>
+    <div id="colecciones-wrap" style="display:none;">
+      <div class="section-label" style="margin-top:16px;">mis colecciones</div>
+      <div id="colecciones-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px;"></div>
+    </div>
+    <div class="section-label" style="margin-top:16px;display:flex;justify-content:space-between;align-items:center;">
+      <span id="lista-titulo">todos mis libros</span>
+      <button id="btn-volver-colecciones" style="display:none;font-size:12px;color:var(--pink-400);background:none;border:none;cursor:pointer;">← ver todas</button>
+    </div>
     <div id="list-todos"></div>
   </div>
 
@@ -283,6 +297,27 @@ textarea.modal-input { resize:vertical; }
       <div id="modal-book-preview" style="display:flex;gap:12px;align-items:center;background:var(--pink-50);border-radius:12px;padding:10px;margin-bottom:14px;"></div>
       <div class="form-group"><label>Título</label><input type="text" id="modal-titulo" class="modal-input" placeholder="título del libro"></div>
       <div class="form-group"><label>Autor</label><input type="text" id="modal-autor" class="modal-input" placeholder="autor"></div>
+      <div class="form-group"><label>Páginas</label><input type="number" id="modal-paginas" class="modal-input" placeholder="ej: 320" min="1"></div>
+      <div class="form-group">
+        <label>¿De qué forma pensás leer este libro?</label>
+        <div id="formato-pills" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;">
+          <span class="genre-pill" data-formato="fisico">📕 Físico</span>
+          <span class="genre-pill" data-formato="kindle">📱 Kindle</span>
+          <span class="genre-pill" data-formato="audiolibro">🎧 Audiolibro</span>
+        </div>
+        <input type="hidden" id="modal-formato">
+      </div>
+      <div class="form-group">
+        <label>¿Es parte de una saga/serie?</label>
+        <div id="saga-pills" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;margin-bottom:8px;">
+          <span class="genre-pill active" data-saga-tipo="unico">📗 Libro único</span>
+          <span class="genre-pill" data-saga-tipo="serie">📚 Forma parte de una colección</span>
+        </div>
+        <div id="saga-detalle" style="display:none;">
+          <input type="text" id="modal-saga-nombre" class="modal-input" placeholder="nombre de la saga/serie/trilogía..." style="margin-bottom:8px;">
+          <input type="number" id="modal-saga-numero" class="modal-input" placeholder="número en la colección (ej: 1, 2, 3...)" min="1">
+        </div>
+      </div>
       <input type="hidden" id="modal-genero">
       <div class="form-group">
         <label>Género</label>
@@ -511,12 +546,16 @@ async function loadBooks() {
 function renderAll() { renderInicio(); renderEstanteria(); renderRatings(); renderMeta(); }
 
 function bookCardHTML(b) {
+  const FORMATO_ICONS = {fisico:'📕',kindle:'📱',audiolibro:'🎧'};
+  const formatoTxt = b.formato ? FORMATO_ICONS[b.formato] || '' : '';
+  const sagaTxt = b.sagaNombre ? `${escHtml(b.sagaNombre)}${b.sagaNumero?' #'+b.sagaNumero:''}` : '';
   return `<div class="book-card" data-id="${b.id}">
     <div class="book-cover" style="background:${b.color||colorForTitle(b.titulo)};">${b.cover?`<img src="${b.cover}" alt="">`:(b.titulo||'').substring(0,8)}</div>
     <div class="book-info">
-      <div class="book-title">${escHtml(b.titulo||'')}</div>
+      <div class="book-title">${escHtml(b.titulo||'')} ${formatoTxt}</div>
       <div class="book-author">${escHtml(b.autor||'')}</div>
       <span class="book-badge">${STATUS_LABELS[b.status]||b.status}</span>
+      ${sagaTxt?`<span class="book-badge" style="margin-left:4px;">📚 ${sagaTxt}</span>`:''}
       ${b.ratings&&b.ratings.general?`<div class="book-stars">${'⭐'.repeat(b.ratings.general)}</div>`:''}
       ${b.relecturas&&b.relecturas.length>1?`<div style="font-size:10px;color:var(--muted);margin-top:2px;">🔄 ${b.relecturas.length} lecturas</div>`:''}
       ${b.fechaLeido?`<div style="font-size:10px;color:var(--muted);margin-top:1px;">📅 ${b.fechaLeido}</div>`:''}
@@ -589,10 +628,63 @@ function renderEstanteria() {
     shelf.querySelectorAll('.shelf-book[data-id]').forEach(el => el.addEventListener('click', () => openEditModal(el.dataset.id)));
   }
 
+  renderColecciones();
+  renderListaLibros(null);
+}
+
+function renderColecciones() {
+  const sagas = {};
+  books.forEach(b => {
+    if (b.sagaNombre && b.sagaNombre.trim()) {
+      const key = b.sagaNombre.trim();
+      if (!sagas[key]) sagas[key] = [];
+      sagas[key].push(b);
+    }
+  });
+  const wrap = document.getElementById('colecciones-wrap');
+  const grid = document.getElementById('colecciones-grid');
+  const sagaKeys = Object.keys(sagas);
+  if (sagaKeys.length === 0) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  grid.innerHTML = sagaKeys.sort().map(nombre => {
+    const libros = sagas[nombre].sort((a,b)=>(a.sagaNumero||0)-(b.sagaNumero||0));
+    const leidosCount = libros.filter(l=>l.status==='leido').length;
+    const portada = libros.find(l=>l.cover)?.cover || '';
+    const colorFondo = libros[0]?.color || colorForTitle(nombre);
+    return `<div class="coleccion-card" data-saga="${escHtml(nombre)}">
+      <div class="coleccion-cover" style="background:${colorFondo};">${portada?`<img src="${portada}" alt="">`:`<span style="font-size:24px;">📚</span>`}</div>
+      <div class="coleccion-info">
+        <div class="coleccion-nombre">${escHtml(nombre)}</div>
+        <div class="coleccion-meta">${libros.length} libro${libros.length>1?'s':''} · ${leidosCount}/${libros.length} leídos</div>
+      </div>
+    </div>`;
+  }).join('');
+  grid.querySelectorAll('.coleccion-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const nombre = card.dataset.saga;
+      document.getElementById('lista-titulo').textContent = `📚 ${nombre}`;
+      document.getElementById('btn-volver-colecciones').style.display = 'inline-block';
+      renderListaLibros(nombre);
+      document.getElementById('list-todos').scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  });
+}
+
+document.getElementById('btn-volver-colecciones').addEventListener('click', () => {
+  document.getElementById('lista-titulo').textContent = 'todos mis libros';
+  document.getElementById('btn-volver-colecciones').style.display = 'none';
+  renderListaLibros(null);
+});
+
+function renderListaLibros(filtroSaga) {
   const el = document.getElementById('list-todos');
-  el.innerHTML = allBooks.length===0
+  let lista = books;
+  if (filtroSaga) {
+    lista = books.filter(b => (b.sagaNombre||'').trim() === filtroSaga).sort((a,b)=>(a.sagaNumero||0)-(b.sagaNumero||0));
+  }
+  el.innerHTML = lista.length===0
     ? '<div class="empty-state"><div>📚</div>Todavía no agregaste libros.</div>'
-    : allBooks.map(b=>bookCardHTML(b)).join('');
+    : lista.map(b=>bookCardHTML(b)).join('');
   attachCardClicks(el);
 }
 
@@ -640,6 +732,26 @@ function renderMeta() {
 }
 
 // ── MODAL LIBRO ───────────────────────────────────
+function renderFormatoPills() {
+  document.querySelectorAll('#formato-pills .genre-pill').forEach(p => {
+    p.classList.toggle('active', p.dataset.formato === selectedFormato);
+  });
+}
+
+document.getElementById('formato-pills').addEventListener('click', e => {
+  const pill = e.target.closest('[data-formato]'); if(!pill) return;
+  selectedFormato = selectedFormato === pill.dataset.formato ? '' : pill.dataset.formato;
+  document.getElementById('modal-formato').value = selectedFormato;
+  renderFormatoPills();
+});
+
+document.getElementById('saga-pills').addEventListener('click', e => {
+  const pill = e.target.closest('[data-saga-tipo]'); if(!pill) return;
+  sagaTipo = pill.dataset.sagaTipo;
+  document.querySelectorAll('#saga-pills .genre-pill').forEach(p => p.classList.toggle('active', p.dataset.sagaTipo === sagaTipo));
+  document.getElementById('saga-detalle').style.display = sagaTipo === 'serie' ? 'block' : 'none';
+});
+
 function resetModal() {
   currentStatus = 'tbr'; currentRec = null; selectedCover = ''; selectedSinopsis = '';
   ratings = {general:0,spice:0,fluff:0,llorar:0,humor:0,plot:0,mundo:0};
@@ -655,6 +767,15 @@ function resetModal() {
   document.getElementById('modal-autor').value = '';
   document.getElementById('modal-genero').value = '';
   document.getElementById('modal-resena').value = '';
+  document.getElementById('modal-paginas').value = '';
+  selectedFormato = '';
+  document.getElementById('modal-formato').value = '';
+  renderFormatoPills();
+  sagaTipo = 'unico';
+  document.querySelectorAll('#saga-pills .genre-pill').forEach(p => p.classList.toggle('active', p.dataset.sagaTipo === 'unico'));
+  document.getElementById('saga-detalle').style.display = 'none';
+  document.getElementById('modal-saga-nombre').value = '';
+  document.getElementById('modal-saga-numero').value = '';
   document.querySelectorAll('.status-pill').forEach(p=>p.classList.toggle('active', p.dataset.status==='tbr'));
   document.getElementById('rating-section').style.display = 'none';
   buildRatingInputs(); updateRecButtons();
@@ -692,6 +813,15 @@ function openEditModal(id) {
   selectedTags = b.tags ? [...b.tags] : [];
   renderGenrePills(); renderTags(); renderTagSuggestions();
   document.getElementById('modal-resena').value = b.resena||'';
+  document.getElementById('modal-paginas').value = b.paginas || '';
+  selectedFormato = b.formato || '';
+  document.getElementById('modal-formato').value = selectedFormato;
+  renderFormatoPills();
+  sagaTipo = b.sagaNombre ? 'serie' : 'unico';
+  document.querySelectorAll('#saga-pills .genre-pill').forEach(p => p.classList.toggle('active', p.dataset.sagaTipo === sagaTipo));
+  document.getElementById('saga-detalle').style.display = sagaTipo === 'serie' ? 'block' : 'none';
+  document.getElementById('modal-saga-nombre').value = b.sagaNombre || '';
+  document.getElementById('modal-saga-numero').value = b.sagaNumero || '';
   currentFechaInicio = b.fechaInicio || '';
   currentFechaFin = b.fechaLeido || '';
   currentRelecturas = b.relecturas ? [...b.relecturas] : [];
@@ -831,6 +961,10 @@ document.getElementById('btn-modal-save').addEventListener('click', async () => 
     autor: document.getElementById('modal-autor').value.trim(),
     genero: document.getElementById('modal-genero').value.trim(),
     tags: [...selectedTags],
+    paginas: document.getElementById('modal-paginas').value ? parseInt(document.getElementById('modal-paginas').value) : null,
+    formato: selectedFormato || null,
+    sagaNombre: sagaTipo === 'serie' ? document.getElementById('modal-saga-nombre').value.trim() : '',
+    sagaNumero: sagaTipo === 'serie' && document.getElementById('modal-saga-numero').value ? parseInt(document.getElementById('modal-saga-numero').value) : null,
     status: currentStatus,
     cover: selectedCover,
     color: colorForTitle(titulo),
@@ -915,6 +1049,8 @@ const TROPES_POR_GENERO = {
 
 let selectedTags = [];
 let selectedGeneros = [];
+let selectedFormato = '';
+let sagaTipo = 'unico';
 
 function renderGenrePills() {
   const el = document.getElementById('genre-pills');
