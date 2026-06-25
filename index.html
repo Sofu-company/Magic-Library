@@ -134,12 +134,68 @@ textarea.modal-input { resize:vertical; }
 .btn-cancel { flex:1; padding:12px; border-radius:12px; border:0.5px solid var(--border); background:var(--bg); color:var(--muted); font-size:14px; cursor:pointer; }
 .btn-delete { padding:12px 16px; border-radius:12px; border:0.5px solid #fcc; background:#fff5f5; color:#c0392b; font-size:14px; cursor:pointer; }
 .btn-save { flex:2; padding:12px; border-radius:12px; border:none; background:var(--pink-400); color:white; font-size:14px; font-weight:500; cursor:pointer; }
-.real-shelf { background:#2d1b0e; border-radius:14px; overflow:hidden; margin-bottom:4px; padding:0; }
+.real-shelf {
+  background:
+  linear-gradient(
+    180deg,
+    #181310,
+    #241b16
+  );
+
+  border-radius:18px;
+
+  overflow:hidden;
+
+  margin-bottom:4px;
+
+  padding:0;
+
+  border:1px solid rgba(184,153,104,.15);
+
+  box-shadow:
+    0 15px 40px rgba(0,0,0,.35);
+}
 .shelf-row { position:relative; padding:10px 10px 0; min-height:90px; display:flex; align-items:flex-end; gap:3px; flex-wrap:nowrap; overflow-x:auto; }
 .shelf-row::-webkit-scrollbar { display:none; }
-.shelf-plank { height:14px; background:linear-gradient(180deg,#8B5E3C 0%,#6B4226 40%,#5a3520 100%); border-bottom:3px solid #3d2010; margin:0 0 0; position:relative; }
+.shelf-plank{
+  height:16px;
+
+  background:
+  linear-gradient(
+    180deg,
+    #7d5738,
+    #5c3d27 40%,
+    #422816 100%
+  );
+
+  border-bottom:4px solid #2d170c;
+
+  position:relative;
+}
+
+.shelf-plank::before{
+  content:'';
+
+  position:absolute;
+  inset:0;
+
+  background:
+  repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 70px,
+    rgba(0,0,0,.08) 70px,
+    rgba(0,0,0,.08) 72px
+  );
+}
 .shelf-plank::before { content:''; position:absolute; inset:0; background:repeating-linear-gradient(90deg,transparent,transparent 60px,rgba(0,0,0,0.07) 60px,rgba(0,0,0,0.07) 62px); }
-.shelf-book { width:28px; flex-shrink:0; border-radius:2px 3px 3px 2px; cursor:pointer; transition:transform 0.15s; position:relative; display:flex; align-items:flex-end; justify-content:center; overflow:hidden; box-shadow:2px 0 4px rgba(0,0,0,0.3); }
+.shelf-book { width:36px; flex-shrink:0; border-radius:2px 3px 3px 2px; cursor:pointer; transition:transform 0.15s; position:relative; display:flex; align-items:flex-end; justify-content:center; overflow:hidden; box-shadow:2px 0 4px rgba(0,0,0,0.3); border-left:2px solid rgba(255,255,255,.15);
+
+border-right:1px solid rgba(0,0,0,.25);
+
+box-shadow:
+  inset 0 0 8px rgba(255,255,255,.05),
+  2px 0 4px rgba(0,0,0,.3); }
 .shelf-book:hover { transform:translateY(-8px); }
 .shelf-book img { width:100%; height:100%; object-fit:cover; border-radius:2px 3px 3px 2px; }
 .shelf-book-spine { width:100%; height:100%; display:flex; align-items:center; justify-content:center; writing-mode:vertical-rl; text-orientation:mixed; font-size:7px; font-weight:700; color:rgba(255,255,255,0.9); padding:4px 2px; text-align:center; line-height:1.2; overflow:hidden; }
@@ -187,6 +243,73 @@ textarea.modal-input { resize:vertical; }
   box-shadow:
     0 8px 25px rgba(0,0,0,.25);
 }
+.study-desk{
+  margin-bottom:18px;
+
+  background:
+  linear-gradient(
+    135deg,
+    #2f241d,
+    #1d1815
+  );
+
+  border:1px solid rgba(184,153,104,.15);
+
+  border-radius:22px;
+
+  padding:18px;
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,.25);
+}
+
+.desk-note{
+  background:#d8c6a6;
+
+  color:#2b211d;
+
+  border-radius:12px;
+
+  padding:18px;
+
+  transform:rotate(-1deg);
+
+  box-shadow:
+    0 4px 10px rgba(0,0,0,.15);
+  
+  position:relative;
+}
+.desk-note::before{
+  content:'📎';
+
+  position:absolute;
+
+  top:-14px;
+  right:18px;
+
+  font-size:24px;
+}
+
+.desk-note-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:24px;
+  font-weight:600;
+
+  margin-bottom:10px;
+}
+
+#desk-quote{
+  font-size:14px;
+  line-height:1.6;
+}
+
+.desk-icons{
+  margin-top:12px;
+
+  font-size:24px;
+
+  text-align:right;
+}
 </style>
 </head>
 <body>
@@ -219,6 +342,30 @@ textarea.modal-input { resize:vertical; }
   <!-- INICIO -->
   <div id="s-inicio" class="screen active">
     <div style="padding-top:8px;">
+      <div class="study-desk">
+
+  <div class="desk-note">
+    <div class="desk-note-title">📜 Bitácora de lectura</div>
+
+    <div id="desk-quote">
+
+  <strong>Bienvenida a tu bitácora.</strong>
+
+  <br><br>
+
+  Aquí descansan las historias que ya viviste,
+  las que estás explorando y aquellas que aún
+  esperan ser descubiertas.
+
+</div>
+    </div>
+
+    <div class="desk-icons">
+  🕯️ &nbsp; 📜 &nbsp; ☕
+    </div>
+  </div>
+
+</div>
       <div id="greeting" style="font-size:16px;font-weight:500;color:var(--pink-600);margin-bottom:14px;"></div>
       <div class="add-book-card" id="btn-add-book-card">
         <div class="add-book-card-text">
