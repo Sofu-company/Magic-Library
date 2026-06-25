@@ -163,7 +163,7 @@ textarea.modal-input { resize:vertical; }
       <div class="add-book-card" id="btn-add-book-card">
         <div class="add-book-card-text">
           <h3>Añadir un libro</h3>
-          <p>¿Hay algún libro que quieras agregar?</p>
+          <p>¿Cuál es tu siguiente lectura?</p>
         </div>
         <div class="add-book-card-plus">+</div>
       </div>
@@ -251,7 +251,7 @@ textarea.modal-input { resize:vertical; }
     <button class="tab" data-tab="meta"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>meta</button>
     <button class="tab" data-tab="perfil"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>perfil</button>
   </div>
-  <button class="fab" id="btn-fab">+</button>
+
 </div>
 
 <!-- MODAL LIBRO -->
@@ -759,7 +759,6 @@ document.getElementById('status-pills').addEventListener('click', e => {
   updateRelecturasSection();
 });
 
-document.getElementById('btn-fab').addEventListener('click', openAddModal);
 document.getElementById('btn-add-book-card').addEventListener('click', openAddModal);
 document.getElementById('btn-modal-cancel').addEventListener('click', closeBookModal);
 document.getElementById('book-modal').addEventListener('click', e => { if(e.target.id==='book-modal') closeBookModal(); });
