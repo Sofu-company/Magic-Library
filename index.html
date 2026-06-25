@@ -3,39 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Biblioteca Nocturna 🕯️</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>Mi Biblioteca 🌸</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --pink-50:#1d1815;
-  --pink-100:#2b221d;
-  --pink-200:#4f4032;
-  --pink-400:#b89968;
-  --pink-600:#8c6b3d;
-  --pink-800:#5f4727;
-
-  --bg:#14110f;
-  --card:#1d1815;
-  --text:#e7dcc9;
-  --muted:#ab9b88;
-
-  --border:rgba(184,153,104,.18);
+  --pink-50: #FBEAF0; --pink-100: #F4C0D1; --pink-200: #ED93B1;
+  --pink-400: #D4537E; --pink-600: #993556; --pink-800: #72243E;
+  --bg: #FDF5F8; --card: #fff; --text: #3a1a2a; --muted: #99607a;
+  --border: rgba(212,83,126,0.15);
 }
-body{
-  font-family: Georgia, serif;
-
-  background:
-  radial-gradient(
-    circle at top,
-    rgba(184,153,104,.08),
-    transparent 35%
-  ),
-  var(--bg);
-
-  color:var(--text);
-  min-height:100vh;
-}
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 #auth-screen { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; }
 .auth-logo { font-size:48px; margin-bottom:8px; }
 .auth-title { font-size:28px; font-weight:600; color:var(--pink-600); margin-bottom:4px; }
@@ -134,68 +111,12 @@ textarea.modal-input { resize:vertical; }
 .btn-cancel { flex:1; padding:12px; border-radius:12px; border:0.5px solid var(--border); background:var(--bg); color:var(--muted); font-size:14px; cursor:pointer; }
 .btn-delete { padding:12px 16px; border-radius:12px; border:0.5px solid #fcc; background:#fff5f5; color:#c0392b; font-size:14px; cursor:pointer; }
 .btn-save { flex:2; padding:12px; border-radius:12px; border:none; background:var(--pink-400); color:white; font-size:14px; font-weight:500; cursor:pointer; }
-.real-shelf {
-  background:
-  linear-gradient(
-    180deg,
-    #181310,
-    #241b16
-  );
-
-  border-radius:18px;
-
-  overflow:hidden;
-
-  margin-bottom:4px;
-
-  padding:0;
-
-  border:1px solid rgba(184,153,104,.15);
-
-  box-shadow:
-    0 15px 40px rgba(0,0,0,.35);
-}
+.real-shelf { background:#2d1b0e; border-radius:14px; overflow:hidden; margin-bottom:4px; padding:0; }
 .shelf-row { position:relative; padding:10px 10px 0; min-height:90px; display:flex; align-items:flex-end; gap:3px; flex-wrap:nowrap; overflow-x:auto; }
 .shelf-row::-webkit-scrollbar { display:none; }
-.shelf-plank{
-  height:16px;
-
-  background:
-  linear-gradient(
-    180deg,
-    #7d5738,
-    #5c3d27 40%,
-    #422816 100%
-  );
-
-  border-bottom:4px solid #2d170c;
-
-  position:relative;
-}
-
-.shelf-plank::before{
-  content:'';
-
-  position:absolute;
-  inset:0;
-
-  background:
-  repeating-linear-gradient(
-    90deg,
-    transparent,
-    transparent 70px,
-    rgba(0,0,0,.08) 70px,
-    rgba(0,0,0,.08) 72px
-  );
-}
+.shelf-plank { height:14px; background:linear-gradient(180deg,#8B5E3C 0%,#6B4226 40%,#5a3520 100%); border-bottom:3px solid #3d2010; margin:0 0 0; position:relative; }
 .shelf-plank::before { content:''; position:absolute; inset:0; background:repeating-linear-gradient(90deg,transparent,transparent 60px,rgba(0,0,0,0.07) 60px,rgba(0,0,0,0.07) 62px); }
-.shelf-book { width:36px; flex-shrink:0; border-radius:2px 3px 3px 2px; cursor:pointer; transition:transform 0.15s; position:relative; display:flex; align-items:flex-end; justify-content:center; overflow:hidden; box-shadow:2px 0 4px rgba(0,0,0,0.3); border-left:2px solid rgba(255,255,255,.15);
-
-border-right:1px solid rgba(0,0,0,.25);
-
-box-shadow:
-  inset 0 0 8px rgba(255,255,255,.05),
-  2px 0 4px rgba(0,0,0,.3); }
+.shelf-book { width:28px; flex-shrink:0; border-radius:2px 3px 3px 2px; cursor:pointer; transition:transform 0.15s; position:relative; display:flex; align-items:flex-end; justify-content:center; overflow:hidden; box-shadow:2px 0 4px rgba(0,0,0,0.3); }
 .shelf-book:hover { transform:translateY(-8px); }
 .shelf-book img { width:100%; height:100%; object-fit:cover; border-radius:2px 3px 3px 2px; }
 .shelf-book-spine { width:100%; height:100%; display:flex; align-items:center; justify-content:center; writing-mode:vertical-rl; text-orientation:mixed; font-size:7px; font-weight:700; color:rgba(255,255,255,0.9); padding:4px 2px; text-align:center; line-height:1.2; overflow:hidden; }
@@ -211,114 +132,15 @@ box-shadow:
 .spinner { text-align:center; padding:20px; color:var(--muted); font-size:13px; }
 .toast { position:fixed; top:20px; left:50%; transform:translateX(-50%); background:var(--pink-600); color:white; padding:10px 20px; border-radius:20px; font-size:13px; z-index:999; opacity:0; transition:opacity 0.3s; pointer-events:none; white-space:nowrap; }
 .toast.show { opacity:1; }
-.auth-title,
-.top-bar-title,
-.modal-title,
-.section-label{
-  font-family:'Cormorant Garamond',serif;
-}
-
-.top-bar-title{
-  font-size:28px;
-  color:var(--pink-400);
-}
-
-.auth-title{
-  font-size:38px;
-  color:var(--pink-400);
-}
-
-.add-book-card{
-  background:linear-gradient(
-    135deg,
-    #5f4727,
-    #2b221d
-  ) !important;
-}
-
-.stat-card,
-.goal-card,
-.book-card,
-.modal{
-  box-shadow:
-    0 8px 25px rgba(0,0,0,.25);
-}
-.study-desk{
-  margin-bottom:18px;
-
-  background:
-  linear-gradient(
-    135deg,
-    #2f241d,
-    #1d1815
-  );
-
-  border:1px solid rgba(184,153,104,.15);
-
-  border-radius:22px;
-
-  padding:18px;
-
-  box-shadow:
-    0 10px 30px rgba(0,0,0,.25);
-}
-
-.desk-note{
-  background:#d8c6a6;
-
-  color:#2b211d;
-
-  border-radius:12px;
-
-  padding:18px;
-
-  transform:rotate(-1deg);
-
-  box-shadow:
-    0 4px 10px rgba(0,0,0,.15);
-  
-  position:relative;
-}
-.desk-note::before{
-  content:'📎';
-
-  position:absolute;
-
-  top:-14px;
-  right:18px;
-
-  font-size:24px;
-}
-
-.desk-note-title{
-  font-family:'Cormorant Garamond',serif;
-  font-size:24px;
-  font-weight:600;
-
-  margin-bottom:10px;
-}
-
-#desk-quote{
-  font-size:14px;
-  line-height:1.6;
-}
-
-.desk-icons{
-  margin-top:12px;
-
-  font-size:24px;
-
-  text-align:right;
-}
 </style>
 </head>
 <body>
 
 <!-- AUTH -->
 <div id="auth-screen">
-  <div class="auth-logo">🕯️</div>
-  <div class="auth-title">biblioteca nocturna</div>
-  <div class="auth-sub">un refugio para lectores</div>
+  <div class="auth-logo">🌸</div>
+  <div class="auth-title">mi biblioteca</div>
+  <div class="auth-sub">tu rincón de lecturas</div>
   <div class="auth-card">
     <div class="auth-tabs">
       <button class="auth-tab active" id="tab-login">Entrar</button>
@@ -335,37 +157,13 @@ box-shadow:
 <!-- APP -->
 <div id="app-screen">
   <div class="top-bar">
-    <span class="top-bar-title">🕯️ biblioteca nocturna</span>
+    <span class="top-bar-title">🌸 mi biblioteca</span>
     <button class="btn-logout" id="btn-logout">Salir</button>
   </div>
 
   <!-- INICIO -->
   <div id="s-inicio" class="screen active">
     <div style="padding-top:8px;">
-      <div class="study-desk">
-
-  <div class="desk-note">
-    <div class="desk-note-title">📜 Bitácora de lectura</div>
-
-    <div id="desk-quote">
-
-  <strong>Bienvenida a tu bitácora.</strong>
-
-  <br><br>
-
-  Aquí descansan las historias que ya viviste,
-  las que estás explorando y aquellas que aún
-  esperan ser descubiertas.
-
-</div>
-    </div>
-
-    <div class="desk-icons">
-  🕯️ &nbsp; 📜 &nbsp; ☕
-    </div>
-  </div>
-
-</div>
       <div id="greeting" style="font-size:16px;font-weight:500;color:var(--pink-600);margin-bottom:14px;"></div>
       <div class="add-book-card" id="btn-add-book-card">
         <div class="add-book-card-text">
@@ -516,12 +314,16 @@ box-shadow:
           <span class="genre-pill" data-saga-tipo="serie">📚 Forma parte de una colección</span>
         </div>
         <div id="saga-detalle" style="display:none;">
-          <div class="search-bar" id="btn-elegir-coleccion" style="cursor:pointer;margin-bottom:8px;">
-            <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-            <span id="coleccion-elegida-texto" style="color:var(--muted);">Elegir o crear colección...</span>
+          <div id="coleccion-elegida-card" style="display:none;align-items:center;gap:10px;background:var(--pink-50);border:0.5px solid var(--border);border-radius:12px;padding:10px;margin-bottom:4px;">
+            <div id="coleccion-elegida-cover" style="width:34px;height:48px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;"></div>
+            <div style="flex:1;">
+              <div id="coleccion-elegida-nombre" style="font-size:13px;font-weight:500;color:var(--text);"></div>
+              <div id="coleccion-elegida-meta" style="font-size:11px;color:var(--muted);"></div>
+            </div>
+            <button id="btn-cambiar-coleccion" type="button" style="font-size:11px;color:var(--pink-400);background:none;border:none;cursor:pointer;">cambiar</button>
           </div>
           <input type="hidden" id="modal-saga-nombre">
-          <input type="number" id="modal-saga-numero" class="modal-input" placeholder="número en la colección (ej: 1, 2, 3...)" min="1">
+          <input type="hidden" id="modal-saga-numero">
         </div>
       </div>
       <input type="hidden" id="modal-genero">
@@ -598,19 +400,16 @@ box-shadow:
 
 <!-- MODAL ELEGIR COLECCIÓN -->
 <div class="modal-overlay" id="coleccion-modal" style="z-index:250;">
-  <div class="modal">
+  <div class="modal" style="max-width:480px;">
     <div class="modal-handle"></div>
-    <div class="modal-title">Elegir colección</div>
-    <div class="search-bar" style="margin-bottom:10px;">
+    <div class="modal-title">Seleccionar colección</div>
+    <div class="search-bar" style="margin-bottom:14px;">
       <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" id="coleccion-buscar-input" placeholder="buscar colección...">
+      <input type="text" id="coleccion-buscar-input" placeholder="busca en la colección...">
     </div>
-    <div id="coleccion-lista" style="max-height:40vh;overflow-y:auto;margin-bottom:10px;"></div>
-    <button id="btn-crear-coleccion" style="width:100%;padding:12px;border-radius:14px;border:1.5px dashed var(--pink-200);background:var(--pink-50);color:var(--pink-600);font-size:13px;cursor:pointer;">
-      ✏️ Crear nueva colección
-    </button>
+    <div id="coleccion-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;max-height:55vh;overflow-y:auto;padding-bottom:4px;"></div>
     <div class="modal-actions">
-      <button class="btn-cancel" id="btn-coleccion-cancel">Cancelar</button>
+      <button class="btn-cancel" id="btn-coleccion-cancel" style="width:100%;">Cancelar</button>
     </div>
   </div>
 </div>
@@ -663,16 +462,7 @@ let userGoal = 30, selectedCover = '', selectedSinopsis = '';
 const RATING_EMOJIS = {general:'⭐',spice:'🌶️',fluff:'🩷',llorar:'😭',humor:'😂',plot:'🎭',mundo:'🌍'};
 const RATING_KEYS = ['general','spice','fluff','llorar','humor','plot','mundo'];
 const STATUS_LABELS = {tbr:'📚 Por leer',leyendo:'📖 Leyendo',leido:'✅ Leído',abandonado:'❌ Abandonado',releyendo:'🔄 Releyendo'};
-const COVER_COLORS = [
-'#5B3A29',
-'#3D2B1F',
-'#6B4F3A',
-'#2E3B2F',
-'#4A2F2F',
-'#34424A',
-'#6A5A3B',
-'#47362A'
-];
+const COVER_COLORS = ['#D4537E','#ED93B1','#993556','#c96b90','#72243E','#E8749A','#B83A6A','#F0A0C0'];
 
 function showToast(msg) {
   const t = document.getElementById('toast');
@@ -985,63 +775,103 @@ document.getElementById('saga-pills').addEventListener('click', e => {
   sagaTipo = pill.dataset.sagaTipo;
   document.querySelectorAll('#saga-pills .genre-pill').forEach(p => p.classList.toggle('active', p.dataset.sagaTipo === sagaTipo));
   document.getElementById('saga-detalle').style.display = sagaTipo === 'serie' ? 'block' : 'none';
+  if (sagaTipo === 'serie' && !document.getElementById('modal-saga-nombre').value) {
+    abrirPickerColecciones();
+  }
 });
 
 // ── PICKER DE COLECCIONES ──────────────────────────
 function getColeccionesExistentes() {
-  const nombres = new Set();
-  books.forEach(b => { if (b.sagaNombre && b.sagaNombre.trim()) nombres.add(b.sagaNombre.trim()); });
-  return [...nombres].sort();
+  const mapa = {};
+  books.forEach(b => {
+    if (b.sagaNombre && b.sagaNombre.trim()) {
+      const key = b.sagaNombre.trim();
+      if (!mapa[key]) mapa[key] = [];
+      mapa[key].push(b);
+    }
+  });
+  return mapa;
 }
 
-function renderColeccionLista(filtro) {
-  const listaEl = document.getElementById('coleccion-lista');
-  const todas = getColeccionesExistentes();
+function renderColeccionGrid(filtro) {
+  const gridEl = document.getElementById('coleccion-grid');
+  const mapa = getColeccionesExistentes();
   const f = (filtro||'').toLowerCase().trim();
-  const filtradas = f ? todas.filter(n => n.toLowerCase().includes(f)) : todas;
-  if (filtradas.length === 0) {
-    listaEl.innerHTML = `<div style="font-size:13px;color:var(--muted);padding:12px 4px;">${todas.length===0 ? 'Todavía no tenés colecciones creadas.' : 'Sin resultados.'}</div>`;
-    return;
-  }
-  listaEl.innerHTML = filtradas.map(nombre => {
-    const count = books.filter(b => (b.sagaNombre||'').trim() === nombre).length;
-    return `<div class="book-card" data-nombre="${escHtml(nombre)}" style="padding:10px;">
-      <div class="book-cover" style="background:${colorForTitle(nombre)};width:38px;height:52px;display:flex;align-items:center;justify-content:center;font-size:18px;">📚</div>
-      <div class="book-info">
-        <div class="book-title">${escHtml(nombre)}</div>
-        <div class="book-author">${count} libro${count>1?'s':''}</div>
+  let nombres = Object.keys(mapa).sort();
+  if (f) nombres = nombres.filter(n => n.toLowerCase().includes(f));
+
+  const addCardHTML = `<div class="coleccion-pick-card" id="btn-add-coleccion-card" style="border:1.5px dashed var(--pink-200);background:var(--pink-50);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:150px;cursor:pointer;">
+    <span style="font-size:13px;color:var(--pink-600);font-weight:500;">Añadir colección</span>
+    <span style="font-size:30px;color:var(--pink-300);line-height:1;">+</span>
+  </div>`;
+
+  const cardsHTML = nombres.map(nombre => {
+    const libros = mapa[nombre];
+    const covers = libros.slice(0,3).map(l => l.cover).filter(Boolean);
+    const stackHTML = covers.length > 0
+      ? covers.map((c,i) => `<img src="${c}" style="position:absolute;width:62%;height:80%;object-fit:cover;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,0.15);left:${i*14}%;top:${i*4}%;z-index:${covers.length-i};">`).join('')
+      : `<div style="font-size:30px;">📚</div>`;
+    return `<div class="coleccion-pick-card" data-nombre="${escHtml(nombre)}" style="min-height:150px;cursor:pointer;display:flex;flex-direction:column;">
+      <div style="position:relative;flex:1;display:flex;align-items:center;justify-content:center;min-height:80px;">${stackHTML}</div>
+      <div style="margin-top:8px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text);">${escHtml(nombre)}</div>
+        <div style="font-size:11px;color:var(--muted);">${libros.length} libro${libros.length>1?'s':''}</div>
       </div>
     </div>`;
   }).join('');
-  listaEl.querySelectorAll('.book-card[data-nombre]').forEach(card => {
-    card.addEventListener('click', () => elegirColeccion(card.dataset.nombre));
+
+  gridEl.innerHTML = addCardHTML + cardsHTML;
+
+  document.getElementById('btn-add-coleccion-card').addEventListener('click', () => {
+    const nombreNuevo = (document.getElementById('coleccion-buscar-input').value || '').trim();
+    if (nombreNuevo) {
+      elegirColeccion(nombreNuevo, 0);
+    } else {
+      const prompt_nombre = window.prompt('Nombre de la nueva colección:');
+      if (prompt_nombre && prompt_nombre.trim()) elegirColeccion(prompt_nombre.trim(), 0);
+    }
+  });
+
+  gridEl.querySelectorAll('.coleccion-pick-card[data-nombre]').forEach(card => {
+    card.addEventListener('click', () => {
+      const nombre = card.dataset.nombre;
+      elegirColeccion(nombre, mapa[nombre].length);
+    });
   });
 }
 
-function elegirColeccion(nombre) {
+function elegirColeccion(nombre, cantidadActual) {
   document.getElementById('modal-saga-nombre').value = nombre;
-  document.getElementById('coleccion-elegida-texto').textContent = nombre;
-  document.getElementById('coleccion-elegida-texto').style.color = 'var(--text)';
+  document.getElementById('modal-saga-numero').value = (cantidadActual||0) + 1;
+  const mapa = getColeccionesExistentes();
+  const libros = mapa[nombre] || [];
+  const cover = libros.find(l=>l.cover)?.cover || '';
+  document.getElementById('coleccion-elegida-cover').style.background = cover ? 'none' : colorForTitle(nombre);
+  document.getElementById('coleccion-elegida-cover').innerHTML = cover ? `<img src="${cover}" style="width:100%;height:100%;object-fit:cover;border-radius:5px;">` : '📚';
+  document.getElementById('coleccion-elegida-nombre').textContent = nombre;
+  document.getElementById('coleccion-elegida-meta').textContent = `Posición #${(cantidadActual||0)+1} en la colección`;
+  document.getElementById('coleccion-elegida-card').style.display = 'flex';
   document.getElementById('coleccion-modal').classList.remove('open');
 }
 
-document.getElementById('btn-elegir-coleccion').addEventListener('click', () => {
+function abrirPickerColecciones() {
   document.getElementById('coleccion-buscar-input').value = '';
-  renderColeccionLista('');
+  renderColeccionGrid('');
   document.getElementById('coleccion-modal').classList.add('open');
-  setTimeout(() => document.getElementById('coleccion-buscar-input').focus(), 100);
+}
+
+document.getElementById('btn-cambiar-coleccion').addEventListener('click', abrirPickerColecciones);
+document.getElementById('coleccion-buscar-input').addEventListener('input', e => renderColeccionGrid(e.target.value));
+document.getElementById('btn-coleccion-cancel').addEventListener('click', () => {
+  document.getElementById('coleccion-modal').classList.remove('open');
+  // If nothing was ever chosen, revert to "libro único"
+  if (!document.getElementById('modal-saga-nombre').value) {
+    sagaTipo = 'unico';
+    document.querySelectorAll('#saga-pills .genre-pill').forEach(p => p.classList.toggle('active', p.dataset.sagaTipo === 'unico'));
+    document.getElementById('saga-detalle').style.display = 'none';
+  }
 });
-
-document.getElementById('coleccion-buscar-input').addEventListener('input', e => renderColeccionLista(e.target.value));
-
-document.getElementById('btn-crear-coleccion').addEventListener('click', () => {
-  const nombre = document.getElementById('coleccion-buscar-input').value.trim();
-  if (!nombre) { showToast('Escribí el nombre de la nueva colección 📚'); return; }
-  elegirColeccion(nombre);
-});
-
-document.getElementById('btn-coleccion-cancel').addEventListener('click', () => document.getElementById('coleccion-modal').classList.remove('open'));
-document.getElementById('coleccion-modal').addEventListener('click', e => { if(e.target.id==='coleccion-modal') document.getElementById('coleccion-modal').classList.remove('open'); });
+document.getElementById('coleccion-modal').addEventListener('click', e => { if(e.target.id==='coleccion-modal') document.getElementById('btn-coleccion-cancel').click(); });
 
 function resetModal() {
   currentStatus = 'tbr'; currentRec = null; selectedCover = ''; selectedSinopsis = '';
@@ -1067,8 +897,7 @@ function resetModal() {
   document.getElementById('saga-detalle').style.display = 'none';
   document.getElementById('modal-saga-nombre').value = '';
   document.getElementById('modal-saga-numero').value = '';
-  document.getElementById('coleccion-elegida-texto').textContent = 'Elegir o crear colección...';
-  document.getElementById('coleccion-elegida-texto').style.color = 'var(--muted)';
+  document.getElementById('coleccion-elegida-card').style.display = 'none';
   document.querySelectorAll('.status-pill').forEach(p=>p.classList.toggle('active', p.dataset.status==='tbr'));
   document.getElementById('rating-section').style.display = 'none';
   buildRatingInputs(); updateRecButtons();
@@ -1115,8 +944,16 @@ function openEditModal(id) {
   document.getElementById('saga-detalle').style.display = sagaTipo === 'serie' ? 'block' : 'none';
   document.getElementById('modal-saga-nombre').value = b.sagaNombre || '';
   document.getElementById('modal-saga-numero').value = b.sagaNumero || '';
-  document.getElementById('coleccion-elegida-texto').textContent = b.sagaNombre || 'Elegir o crear colección...';
-  document.getElementById('coleccion-elegida-texto').style.color = b.sagaNombre ? 'var(--text)' : 'var(--muted)';
+  if (b.sagaNombre) {
+    const cover = b.cover || '';
+    document.getElementById('coleccion-elegida-cover').style.background = cover ? 'none' : colorForTitle(b.sagaNombre);
+    document.getElementById('coleccion-elegida-cover').innerHTML = cover ? `<img src="${cover}" style="width:100%;height:100%;object-fit:cover;border-radius:5px;">` : '📚';
+    document.getElementById('coleccion-elegida-nombre').textContent = b.sagaNombre;
+    document.getElementById('coleccion-elegida-meta').textContent = b.sagaNumero ? `Posición #${b.sagaNumero} en la colección` : 'Forma parte de esta colección';
+    document.getElementById('coleccion-elegida-card').style.display = 'flex';
+  } else {
+    document.getElementById('coleccion-elegida-card').style.display = 'none';
+  }
   currentFechaInicio = b.fechaInicio || '';
   currentFechaFin = b.fechaLeido || '';
   currentRelecturas = b.relecturas ? [...b.relecturas] : [];
