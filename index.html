@@ -11,64 +11,148 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg-dark: #120f0d;
-  --wood-dark: #1a1411;
-  --parchment: #ded0b6;
-  --parchment-light: #ecdcb9;
-  --leather: #171210;
-  --gold: #c39b62;
-  --gold-muted: #8c6f46;
-  --text-dark: #231b15;
-  --text-light: #dcd1c4;
-  --text-muted: #8b7d70;
-  --border-dark: rgba(195, 155, 98, 0.15);
+  --bg-dark: #0f0c0a;             /* Fondo exterior ultra oscuro */
+  --wood-dark: #1b130f;           /* Fondo de la mesa de madera de la app */
+  --parchment: #ebdcb9;           /* Color pergamino claro e iluminado para los libros */
+  --parchment-burn: #d5c298;      /* Sombras del papel antiguo */
+  --leather: #140e0b;             /* Fondo de tarjetas oscuras empotradas */
+  --gold: #c39b62;                /* Dorado antiguo */
+  --gold-muted: #8c6f46;          /* Bronce */
+  --text-dark: #1c1410;           /* Texto oscuro de alta visibilidad sobre pergamino */
+  --text-light: #e5dec9;          /* Texto claro sobre fondos de madera/cuero */
+  --text-muted: #857467;          /* Texto secundario atenuado */
 }
 
 body { 
   font-family: 'Playfair Display', Georgia, serif; 
   background-color: var(--bg-dark); 
-  background-image: radial-gradient(circle at 50% 50%, rgba(26,20,17,0.3) 0%, rgba(12,10,9,1) 100%);
   color: var(--text-light); 
   min-height: 100vh; 
 }
 
+/* Pantalla de Autenticación */
 #auth-screen { 
-  min-height: 100vh; 
-  display: flex; 
-  flex-direction: column; 
-  align-items: center; 
-  justify-content: center; 
-  padding: 24px; 
+  min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; 
 }
 .auth-logo { font-size: 44px; margin-bottom: 8px; color: var(--gold); }
-.auth-title { font-family: 'Cinzel', serif; font-size: 28px; font-weight: 500; color: var(--gold); letter-spacing: 2px; text-align: center; }
-.auth-sub { font-style: italic; font-size: 13px; color: var(--text-muted); margin-bottom: 24px; text-align: center; }
-.auth-card { background: var(--leather); border-radius: 8px; border: 1px solid var(--border-dark); padding: 24px; width: 100%; max-width: 360px; box-shadow: 0 20px 50px rgba(0,0,0,0.7); }
-
+.auth-title { font-family: 'Cinzel', serif; font-size: 28px; color: var(--gold); letter-spacing: 2px; text-align: center; }
+.auth-sub { font-style: italic; font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+.auth-card { background: var(--leather); border-radius: 8px; border: 1px solid rgba(195,155,98,0.15); padding: 24px; width: 100%; max-width: 360px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); }
 .auth-tabs { display: flex; margin-bottom: 20px; border-bottom: 1px solid #2e241f; }
 .auth-tab { background: none; border: none; color: var(--text-muted); padding: 10px; flex: 1; cursor: pointer; font-family: 'Cinzel', serif; font-size: 13px; }
 .auth-tab.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
 
+/* Campos de Formulario Universales */
 .form-group { margin-bottom: 16px; }
-.form-group label { display: block; font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 1px; }
-.form-group input, .form-group select, .form-group textarea, .modal-input, .modal-select { 
-  width: 100%; padding: 12px; border-radius: 4px; border: 1px solid #2e241f; background: #0f0c0a; font-family: inherit; font-size: 14px; color: var(--text-light); outline: none; 
+.form-group label { display: block; font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; }
+.form-group input, .form-group select, .modal-input, .modal-select { 
+  width: 100%; padding: 12px; border-radius: 4px; border: 1px solid #32251e; background: #0a0807; font-family: inherit; font-size: 14px; color: var(--text-light); outline: none; 
 }
 .form-group input:focus, .modal-input:focus { border-color: var(--gold); }
 
+/* Contenedor Principal de la App (Ancho móvil simulado) */
 #app-screen { 
-  display: none; max-width: 480px; margin: 0 auto; padding-bottom: 90px; background: var(--wood-dark); box-shadow: 0 0 40px rgba(0,0,0,0.9); min-height: 100vh; position: relative;
+  display: none; 
+  max-width: 480px; 
+  margin: 0 auto; 
+  padding-bottom: 96px; 
+  background: var(--wood-dark); 
+  box-shadow: 0 0 50px rgba(0,0,0,0.9); 
+  min-height: 100vh;
+  border-left: 1px solid rgba(195,155,98,0.05);
+  border-right: 1px solid rgba(195,155,98,0.05);
 }
 
+/* Top Bar superior */
 .top-bar { 
-  background: #15110e; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; border-bottom: 1px solid rgba(195, 155, 98, 0.08); 
+  background: #110a08; padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; border-bottom: 1px solid rgba(195,155,98,0.1); 
 }
 .top-bar-title { font-family: 'Cinzel', serif; font-size: 19px; color: var(--text-light); letter-spacing: 1px; text-transform: lowercase; margin: 0 auto; }
 .top-bar-icon { color: var(--gold); background: none; border: none; font-size: 18px; cursor: pointer; }
 
+/* Contenedores de Pantallas */
 .screen { display: none; padding: 20px; }
 .screen.active { display: block; }
 
-/* Tarjeta Pergamino de Bienvenida */
+/* Tarjeta de Bienvenida: Pergamino Central Alto Contraste */
 .welcome-parchment {
-  background: #e5d3b3; background-image: radial-gradient(circle at 50% 50%, #ecdcb9 0%, #d8c29d 100%); border-radius: 4px; box-shadow: inset 0 0 20px rgba(40,30,20,0.2), 0 10px 25px rgba(0
+  background: var(--parchment);
+  background-image: radial-gradient(circle at 50% 50%, #f4e8cd 0%, var(--parchment-burn) 100%);
+  border-radius: 4px;
+  box-shadow: inset 0 0 15px rgba(40,30,20,0.25), 0 10px 25px rgba(0,0,0,0.5);
+  padding: 30px 20px;
+  text-align: center;
+  color: var(--text-dark);
+  margin-bottom: 20px;
+  border: 1px solid #c8b48d;
+}
+.welcome-parchment h2 { font-size: 26px; font-weight: 500; font-style: italic; margin-bottom: 4px; font-family: 'Playfair Display', serif; }
+.welcome-parchment p { font-size: 14px; color: #4e3c2f; margin-bottom: 12px; }
+.flourish { font-size: 12px; color: #7a634e; letter-spacing: -1px; }
+
+/* Fila de Progreso Metas y Estadísticas Minimalistas */
+.stat-row { display: flex; gap: 12px; margin-bottom: 20px; }
+.leather-card { 
+  flex: 1; 
+  background: var(--leather); 
+  border: 1px solid rgba(195, 155, 98, 0.1); 
+  border-radius: 6px; 
+  padding: 14px; 
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.6), 0 4px 10px rgba(0,0,0,0.3); 
+}
+.leather-card-title { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+.badge-tbr { background: rgba(140, 111, 70, 0.25); color: var(--gold); border: 1px solid rgba(195,155,98,0.2); padding: 1px 6px; border-radius: 3px; font-size: 10px; font-family: sans-serif; }
+.progress-digits { font-family: 'Cinzel', serif; font-size: 22px; color: var(--text-light); font-weight: 600; }
+.progress-subtext { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.academia-bar-bg { background: #251d19; height: 5px; border-radius: 2px; margin-top: 10px; overflow: hidden; }
+.academia-bar-fill { background: var(--gold-muted); height: 100%; width: 0%; transition: width 0.4s; }
+
+/* Pequeño gráfico de barras simulado */
+.mini-chart { display: flex; align-items: flex-end; gap: 4px; height: 34px; margin-top: 6px; }
+.mini-bar { flex: 1; background: rgba(195, 155, 98, 0.1); border-top: 2px solid var(--gold-muted); height: 20%; }
+.mini-bar:nth-child(2) { height: 50%; }
+.mini-bar:nth-child(3) { height: 35%; }
+.mini-bar:nth-child(4) { height: 75%; }
+.mini-bar:nth-child(5) { height: 90%; }
+.mini-bar:nth-child(6) { height: 60%; }
+
+.section-label { font-size: 13px; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin: 22px 0 12px; border-bottom: 1px solid rgba(195,155,98,0.1); padding-bottom: 4px; font-weight: 600; }
+
+/* BLOQUE DE LIBROS CLARO (Estilo Pergamino de la imagen original - Solución Definitiva) */
+.academia-book-container { 
+  background: var(--parchment); 
+  background-image: linear-gradient(180deg, #f2e6cb 0%, var(--parchment-burn) 100%);
+  border-radius: 4px; 
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,0,0,0.05); 
+  padding: 6px; 
+  position: relative; 
+  border: 1px solid #c4b087;
+}
+.academia-book-container::after { content: '📎'; position: absolute; top: 12px; right: 16px; font-size: 18px; opacity: 0.6; transform: rotate(45deg); pointer-events: none; }
+
+/* Tarjetas internas de Libros (Texto ultra legible sobre el pergamino claro) */
+.book-card { display: flex; gap: 14px; border-bottom: 1px dashed rgba(40,30,20,0.2); padding: 16px 12px; cursor: pointer; transition: background 0.2s; }
+.book-card:last-child { border-bottom: none; }
+.book-card:hover { background: rgba(40,30,20,0.03); }
+
+.book-cover-art { 
+  width: 52px; height: 74px; background: #231914; color: var(--parchment); display: flex; align-items: center; justify-content: center; font-size: 22px; border-radius: 2px; box-shadow: 3px 4px 8px rgba(0,0,0,0.4); flex-shrink: 0; border: 1px solid rgba(195,155,98,0.2);
+}
+.book-info { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+.book-title { font-size: 16px; font-weight: 700; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Playfair Display', serif; }
+.book-author { font-size: 13px; color: #4e3c2f; margin-top: 2px; font-style: italic; }
+.book-stars { font-size: 12px; color: #916f3e; margin-top: 4px; letter-spacing: 1px; }
+
+.book-progress-wrapper { margin-top: 8px; display: flex; align-items: center; gap: 10px; }
+.book-progress-bar-bg { flex: 1; background: rgba(40,30,20,0.15); height: 4px; border-radius: 2px; overflow: hidden; }
+.book-progress-bar-fill { background: #4e3521; height: 100%; transition: width 0.3s; }
+.book-progress-pct { font-size: 12px; font-weight: 700; color: var(--text-dark); }
+
+/* Filtros horizontales para estantería */
+.filter-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 14px; }
+.filter-chip { background: #140e0b; border: 1px solid #2a1f1a; color: var(--text-muted); padding: 6px 14px; border-radius: 20px; font-size: 12px; cursor: pointer; white-space: nowrap; font-family: inherit; }
+.filter-chip.active { background: var(--gold-muted); color: #110a08; border-color: var(--gold); font-weight: 600; }
+
+/* Barra de Navegación Inferior Estilo Cuero / Bronce */
+.tab-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; display: flex; background: #0f0a08; border-top: 1px solid rgba(195, 155, 98, 0.12); z-index: 100; box-shadow: 0 -8px 30px rgba(0,0,0,0.8); }
+.tab { flex: 1; padding: 12px 2px; text-align: center; cursor: pointer;
