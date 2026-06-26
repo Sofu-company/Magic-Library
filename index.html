@@ -3,73 +3,93 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mi Biblioteca 🌸</title>
+<title>Biblioteca Nocturna 🕯️</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --pink-50: #FBEAF0; --pink-100: #F4C0D1; --pink-200: #ED93B1;
-  --pink-400: #D4537E; --pink-600: #993556; --pink-800: #72243E;
-  --bg: #FDF5F8; --card: #fff; --text: #3a1a2a; --muted: #99607a;
-  --border: rgba(212,83,126,0.15);
+  --pink-50: #2a2018; --pink-100: #6b4a2f; --pink-200: #8a6238;
+  --pink-400: #b8863f; --pink-600: #d4a24c; --pink-800: #e8c878;
+  --bg: #1a140e; --card: #241b13; --text: #ece0c8; --muted: #a8916e;
+  --border: rgba(212,162,76,0.18);
+  --ink: #ece0c8;
+  --parchment: #e8dcc0;
+  --parchment-dark: #d4c5a0;
+  --candle: #ffb84d;
+  --wood-dark: #1f1611;
+  --wood-mid: #2e2118;
+  --wood-light: #3d2c1f;
+  --font-display: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
+  --font-body: 'EB Garamond', Georgia, serif;
+  --font-hand: 'Caveat', cursive;
 }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-#auth-screen { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; }
-.auth-logo { font-size:48px; margin-bottom:8px; }
-.auth-title { font-size:28px; font-weight:600; color:var(--pink-600); margin-bottom:4px; }
-.auth-sub { font-size:14px; color:var(--muted); margin-bottom:32px; }
-.auth-card { background:var(--card); border-radius:20px; border:0.5px solid var(--border); padding:28px 24px; width:100%; max-width:360px; }
-.auth-tabs { display:flex; margin-bottom:24px; border-radius:10px; overflow:hidden; border:0.5px solid var(--border); }
-.auth-tab { flex:1; padding:10px; text-align:center; cursor:pointer; font-size:14px; background:var(--bg); color:var(--muted); border:none; transition:all 0.2s; }
-.auth-tab.active { background:var(--pink-400); color:white; font-weight:500; }
+body { font-family: var(--font-body); background: var(--bg); color: var(--text); min-height: 100vh; }
+#auth-screen { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; background: radial-gradient(ellipse at 30% 20%, rgba(255,184,77,0.08) 0%, transparent 45%), linear-gradient(180deg, var(--wood-dark) 0%, var(--wood-mid) 100%); }
+.auth-logo { font-size:48px; margin-bottom:8px; filter: drop-shadow(0 0 12px rgba(255,184,77,0.4)); }
+.auth-title { font-family:var(--font-display); font-size:34px; font-weight:600; font-style:italic; color:var(--pink-800); margin-bottom:6px; letter-spacing:0.3px; }
+.auth-sub { font-family:var(--font-hand); font-size:19px; color:var(--muted); margin-bottom:32px; }
+.auth-card { background:var(--card); border-radius:6px; border:1px solid var(--border); padding:28px 24px; width:100%; max-width:360px; box-shadow:0 0 0 1px rgba(0,0,0,0.3), 0 20px 50px rgba(0,0,0,0.5); }
+.auth-tabs { display:flex; margin-bottom:24px; border-radius:4px; overflow:hidden; border:0.5px solid var(--border); }
+.auth-tab { flex:1; padding:10px; text-align:center; cursor:pointer; font-size:14px; background:var(--bg); color:var(--muted); border:none; transition:all 0.2s; font-family:var(--font-body); letter-spacing:0.3px; }
+.auth-tab.active { background:var(--pink-400); color:var(--wood-dark); font-weight:600; }
 .form-group { margin-bottom:14px; }
 .form-group label { display:block; font-size:12px; color:var(--muted); margin-bottom:5px; font-weight:500; }
-.form-group input, .modal-input { width:100%; padding:11px 14px; border-radius:10px; border:0.5px solid var(--border); background:var(--pink-50); font-size:15px; color:var(--text); outline:none; transition:border-color 0.2s; font-family:inherit; }
+.form-group input, .modal-input { width:100%; padding:11px 14px; border-radius:4px; border:0.5px solid var(--border); background:var(--bg); font-size:15px; color:var(--text); outline:none; transition:border-color 0.2s; font-family:var(--font-body); }
 .form-group input:focus, .modal-input:focus { border-color:var(--pink-400); }
 textarea.modal-input { resize:vertical; }
-.btn-main { width:100%; padding:13px; border-radius:12px; border:none; background:var(--pink-400); color:white; font-size:15px; font-weight:500; cursor:pointer; margin-top:4px; transition:background 0.2s; }
+.btn-main { width:100%; padding:13px; border-radius:4px; border:1px solid var(--pink-600); background:var(--pink-400); color:var(--wood-dark); font-size:15px; font-weight:600; cursor:pointer; margin-top:4px; transition:background 0.2s; font-family:var(--font-body); letter-spacing:0.4px; }
 .btn-main:hover { background:var(--pink-600); }
-.auth-error { font-size:13px; color:#c0392b; margin-top:10px; text-align:center; min-height:18px; }
+.auth-error { font-size:13px; color:#d4756a; margin-top:10px; text-align:center; min-height:18px; }
 #app-screen { display:none; max-width:480px; margin:0 auto; padding-bottom:80px; }
-.top-bar { background:var(--pink-50); padding:16px 20px 12px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:50; border-bottom:0.5px solid var(--border); }
-.top-bar-title { font-size:20px; font-weight:600; color:var(--pink-600); }
-.btn-logout { font-size:12px; color:var(--muted); background:none; border:0.5px solid var(--border); padding:5px 10px; border-radius:20px; cursor:pointer; }
+.top-bar { background:var(--wood-dark); padding:16px 20px 12px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:50; border-bottom:1px solid var(--border); }
+.top-bar-title { font-family:var(--font-display); font-size:21px; font-weight:600; font-style:italic; color:var(--pink-800); }
+.btn-logout { font-size:11px; color:var(--muted); background:none; border:0.5px solid var(--border); padding:5px 10px; border-radius:3px; cursor:pointer; font-family:var(--font-body); letter-spacing:0.3px; }
 .screen { display:none; padding:16px; }
 .screen.active { display:block; }
-.section-label { font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; margin-top:4px; }
+.section-label { font-family:var(--font-body); font-size:11px; font-weight:600; color:var(--pink-600); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:12px; margin-top:4px; }
+.desk-scene { position:relative; width:100%; height:280px; overflow:hidden; margin-bottom:14px; }
+.desk-svg { width:100%; height:100%; display:block; }
+.desk-overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding:20px; }
+.welcome-card { background:var(--parchment); color:#3d2c1f; border-radius:3px; padding:20px 26px; text-align:center; max-width:240px; box-shadow:0 8px 24px rgba(0,0,0,0.45); position:relative; clip-path: polygon(2% 0%, 98% 1%, 100% 96%, 3% 100%); }
+.welcome-title { font-family:var(--font-display); font-style:italic; font-size:24px; font-weight:600; line-height:1.15; color:#3d2c1f; }
+.welcome-q { font-family:var(--font-hand); font-size:15px; color:#6b4a2f; margin-top:8px; }
+.welcome-divider { font-size:11px; color:#8a6238; margin-top:8px; letter-spacing:2px; }
 .stat-row { display:flex; gap:8px; margin-bottom:16px; }
-.stat-card { flex:1; background:var(--pink-50); border-radius:12px; padding:12px 8px; text-align:center; border:0.5px solid var(--border); }
-.stat-num { font-size:22px; font-weight:600; color:var(--pink-600); }
-.stat-lbl { font-size:10px; color:var(--muted); margin-top:2px; }
-.goal-card { background:var(--card); border:0.5px solid var(--border); border-radius:14px; padding:14px; margin-bottom:16px; }
+.stat-card { flex:1; background:var(--card); border-radius:4px; padding:12px 8px; text-align:center; border:0.5px solid var(--border); }
+.stat-num { font-family:var(--font-display); font-size:22px; font-weight:600; color:var(--pink-600); }
+.stat-lbl { font-size:10px; color:var(--muted); margin-top:2px; letter-spacing:0.3px; }
+.goal-card { background:var(--card); border:0.5px solid var(--border); border-radius:4px; padding:14px; margin-bottom:16px; }
 .add-book-card {
-  background:linear-gradient(135deg,var(--pink-400),var(--pink-600));
-  border-radius:18px; padding:22px 20px; margin-bottom:18px;
+  background:linear-gradient(135deg,var(--wood-light),var(--wood-mid));
+  border:1px solid var(--border); border-radius:4px; padding:22px 20px; margin-bottom:18px;
   cursor:pointer; position:relative; overflow:hidden;
   display:flex; align-items:center; justify-content:space-between;
   transition:transform 0.15s;
 }
 .add-book-card:hover { transform:translateY(-2px); }
-.add-book-card-text h3 { color:white; font-size:19px; font-weight:600; margin-bottom:4px; }
-.add-book-card-text p { color:rgba(255,255,255,0.85); font-size:13px; }
+.add-book-card-text h3 { font-family:var(--font-display); color:var(--pink-800); font-size:20px; font-weight:600; margin-bottom:4px; font-style:italic; }
+.add-book-card-text p { font-family:var(--font-hand); color:var(--muted); font-size:15px; }
 .add-book-card-plus {
-  width:52px; height:52px; border-radius:50%; background:rgba(255,255,255,0.25);
-  display:flex; align-items:center; justify-content:center; font-size:28px; color:white;
+  width:48px; height:48px; border-radius:50%; background:rgba(212,162,76,0.18); border:1px solid var(--pink-400);
+  display:flex; align-items:center; justify-content:center; font-size:24px; color:var(--pink-600);
   flex-shrink:0; margin-left:12px;
 }
-.goal-bar-bg { background:var(--pink-100); border-radius:20px; height:10px; margin:8px 0; }
-.goal-bar-fill { background:var(--pink-400); border-radius:20px; height:10px; transition:width 0.5s; }
-.book-card { display:flex; gap:12px; background:var(--card); border:0.5px solid var(--border); border-radius:14px; padding:12px; margin-bottom:10px; cursor:pointer; transition:border-color 0.15s; }
-.book-card:hover { border-color:var(--pink-200); }
-.book-cover { width:50px; height:68px; border-radius:6px; flex-shrink:0; background:linear-gradient(135deg,var(--pink-200),var(--pink-400)); display:flex; align-items:center; justify-content:center; font-size:8px; color:white; text-align:center; padding:4px; font-weight:500; line-height:1.3; overflow:hidden; }
-.book-cover img { width:100%; height:100%; object-fit:cover; border-radius:4px; }
+.goal-bar-bg { background:var(--wood-mid); border-radius:2px; height:8px; margin:8px 0; border:0.5px solid var(--border); }
+.goal-bar-fill { background:var(--pink-400); border-radius:2px; height:100%; transition:width 0.5s; }
+.book-card { display:flex; gap:12px; background:var(--card); border:0.5px solid var(--border); border-radius:4px; padding:12px; margin-bottom:10px; cursor:pointer; transition:border-color 0.15s; }
+.book-card:hover { border-color:var(--pink-400); }
+.book-cover { width:50px; height:68px; border-radius:2px; flex-shrink:0; background:linear-gradient(135deg,var(--pink-200),var(--pink-400)); display:flex; align-items:center; justify-content:center; font-size:8px; color:var(--wood-dark); text-align:center; padding:4px; font-weight:600; line-height:1.3; overflow:hidden; border:0.5px solid rgba(0,0,0,0.3); }
+.book-cover img { width:100%; height:100%; object-fit:cover; border-radius:1px; }
 .book-info { flex:1; min-width:0; }
-.book-title { font-size:14px; font-weight:500; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.book-author { font-size:12px; color:var(--muted); margin-top:2px; }
-.book-badge { display:inline-block; margin-top:6px; font-size:10px; padding:2px 8px; border-radius:20px; background:var(--pink-50); color:var(--pink-600); border:0.5px solid var(--pink-100); }
+.book-title { font-family:var(--font-body); font-size:15px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.book-author { font-size:12px; color:var(--muted); margin-top:2px; font-style:italic; }
+.book-badge { display:inline-block; margin-top:6px; font-size:10px; padding:2px 8px; border-radius:2px; background:var(--bg); color:var(--pink-600); border:0.5px solid var(--border); letter-spacing:0.3px; }
 .book-stars { font-size:11px; color:var(--pink-400); margin-top:4px; }
-.tab-bar { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; display:flex; background:var(--card); border-top:0.5px solid var(--border); z-index:100; }
-.tab { flex:1; padding:10px 4px 14px; text-align:center; cursor:pointer; border:none; background:none; font-size:10px; color:var(--muted); transition:color 0.15s; }
-.tab.active { color:var(--pink-400); }
+.tab-bar { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; display:flex; background:var(--wood-dark); border-top:1px solid var(--border); z-index:100; }
+.tab { flex:1; padding:10px 4px 14px; text-align:center; cursor:pointer; border:none; background:none; font-size:10px; color:var(--muted); transition:color 0.15s; font-family:var(--font-body); letter-spacing:0.3px; }
+.tab.active { color:var(--pink-600); }
 .tab svg { display:block; margin:0 auto 2px; width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
 .search-bar { display:flex; align-items:center; gap:10px; background:var(--pink-50); border:0.5px solid var(--border); border-radius:12px; padding:10px 14px; margin-bottom:14px; }
 .search-bar input { flex:1; background:none; border:none; outline:none; font-size:14px; color:var(--text); font-family:inherit; }
@@ -138,9 +158,9 @@ textarea.modal-input { resize:vertical; }
 
 <!-- AUTH -->
 <div id="auth-screen">
-  <div class="auth-logo">🌸</div>
-  <div class="auth-title">mi biblioteca</div>
-  <div class="auth-sub">tu rincón de lecturas</div>
+  <div class="auth-logo">🕯️</div>
+  <div class="auth-title">Biblioteca Nocturna</div>
+  <div class="auth-sub">¿Qué historia vas a vivir hoy?</div>
   <div class="auth-card">
     <div class="auth-tabs">
       <button class="auth-tab active" id="tab-login">Entrar</button>
@@ -157,38 +177,110 @@ textarea.modal-input { resize:vertical; }
 <!-- APP -->
 <div id="app-screen">
   <div class="top-bar">
-    <span class="top-bar-title">🌸 mi biblioteca</span>
+    <span class="top-bar-title">Biblioteca Nocturna 🕯️</span>
     <button class="btn-logout" id="btn-logout">Salir</button>
   </div>
 
   <!-- INICIO -->
   <div id="s-inicio" class="screen active">
-    <div style="padding-top:8px;">
-      <div id="greeting" style="font-size:16px;font-weight:500;color:var(--pink-600);margin-bottom:14px;"></div>
-      <div class="add-book-card" id="btn-add-book-card">
-        <div class="add-book-card-text">
-          <h3>Añadir un libro</h3>
-          <p>¿Cuál es tu siguiente lectura?</p>
+    <div class="desk-scene">
+      <svg viewBox="0 0 400 280" class="desk-svg" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <radialGradient id="candleGlow" cx="50%" cy="30%" r="60%">
+            <stop offset="0%" stop-color="#ffb84d" stop-opacity="0.35"/>
+            <stop offset="100%" stop-color="#ffb84d" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="woodGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#2e2118"/>
+            <stop offset="100%" stop-color="#1f1611"/>
+          </linearGradient>
+        </defs>
+        <rect width="400" height="280" fill="url(#woodGrad)"/>
+        <g opacity="0.18" stroke="#3d2c1f" stroke-width="1">
+          <path d="M0,40 Q200,30 400,45"/><path d="M0,90 Q200,80 400,95"/>
+          <path d="M0,140 Q200,150 400,135"/><path d="M0,190 Q200,180 400,195"/>
+          <path d="M0,230 Q200,240 400,225"/>
+        </g>
+        <circle cx="200" cy="90" r="90" fill="url(#candleGlow)"/>
+        <g transform="translate(48,150)">
+          <rect x="-26" y="14" width="52" height="10" rx="2" fill="#5a3e26"/>
+          <rect x="-30" y="22" width="60" height="8" rx="2" fill="#4a3220"/>
+          <rect x="-22" y="-58" width="44" height="72" rx="1" fill="#7a5230"/>
+          <rect x="-22" y="-58" width="44" height="6" fill="#8a6238"/>
+          <rect x="-17" y="-50" width="34" height="3" fill="#3d2c1f" opacity="0.5"/>
+          <rect x="-17" y="-40" width="34" height="3" fill="#3d2c1f" opacity="0.5"/>
+        </g>
+        <g transform="translate(118,158)">
+          <ellipse cx="0" cy="40" rx="34" ry="6" fill="#000" opacity="0.25"/>
+          <rect x="-4" y="2" width="8" height="34" fill="#caa86a"/>
+          <ellipse cx="0" cy="2" rx="9" ry="3" fill="#e8c878"/>
+          <path d="M-2,-38 Q3,-20 0,2 Q-3,-20 2,-38 Z" fill="#ffb84d"/>
+          <path d="M-1,-30 Q2,-18 0,0 Q-2,-18 1,-30 Z" fill="#fff1d0"/>
+        </g>
+        <g transform="translate(280,130)">
+          <ellipse cx="0" cy="62" rx="60" ry="8" fill="#000" opacity="0.22"/>
+          <g transform="rotate(-3)"><rect x="-42" y="20" width="84" height="14" rx="1" fill="#6b4a2f"/><rect x="-42" y="20" width="84" height="3" fill="#8a6238"/></g>
+          <g transform="rotate(2)"><rect x="-38" y="6" width="76" height="14" rx="1" fill="#5a3e26"/><rect x="-38" y="6" width="76" height="3" fill="#7a5230"/></g>
+          <g transform="rotate(-1)"><rect x="-44" y="-8" width="88" height="14" rx="1" fill="#3d2c1f"/><rect x="-44" y="-8" width="88" height="3" fill="#6b4a2f"/></g>
+          <g transform="translate(20,-40) rotate(8)">
+            <path d="M-30,0 L30,0 L30,28 Q0,38 -30,28 Z" fill="#e8dcc0"/>
+            <path d="M-30,0 L0,8 L30,0" fill="none" stroke="#caa86a" stroke-width="1"/>
+          </g>
+        </g>
+        <g transform="translate(345,165)">
+          <ellipse cx="0" cy="26" rx="22" ry="5" fill="#000" opacity="0.22"/>
+          <path d="M-16,0 Q-18,22 0,24 Q18,22 16,0 Z" fill="#caa86a"/>
+          <ellipse cx="0" cy="0" rx="16" ry="4" fill="#3d2418"/>
+          <path d="M16,4 Q28,4 26,14 Q24,20 14,18" fill="none" stroke="#caa86a" stroke-width="3"/>
+        </g>
+        <g transform="translate(60,225)" opacity="0.85">
+          <path d="M-20,18 L-16,-14 L20,-10 L18,20 Z" fill="#e8dcc0" opacity="0.9"/>
+          <path d="M-20,18 L-16,-14 L20,-10" fill="none" stroke="#caa86a" stroke-width="0.6"/>
+          <line x1="-12" y1="-4" x2="10" y2="-2" stroke="#a8916e" stroke-width="0.5"/>
+          <line x1="-12" y1="4" x2="10" y2="6" stroke="#a8916e" stroke-width="0.5"/>
+        </g>
+      </svg>
+      <div class="desk-overlay">
+        <div class="welcome-card">
+          <div class="welcome-title">Bienvenida,<br>lectora</div>
+          <div class="welcome-q" id="greeting">¿Qué historia vas a vivir hoy?</div>
+          <div class="welcome-divider">❧ ── ❧</div>
         </div>
-        <div class="add-book-card-plus">+</div>
       </div>
-      <div class="stat-row">
-        <div class="stat-card"><div class="stat-num" id="cnt-leyendo">0</div><div class="stat-lbl">leyendo</div></div>
-        <div class="stat-card"><div class="stat-num" id="cnt-leido">0</div><div class="stat-lbl">leídos</div></div>
-        <div class="stat-card"><div class="stat-num" id="cnt-tbr">0</div><div class="stat-lbl">por leer</div></div>
-      </div>
-      <div class="goal-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-size:14px;font-weight:500;">meta <span id="goal-year"></span></span>
-          <button id="btn-edit-goal" style="font-size:12px;color:var(--pink-400);background:none;border:none;cursor:pointer;">cambiar</button>
-        </div>
-        <div class="goal-bar-bg"><div class="goal-bar-fill" id="goal-bar" style="width:0%;"></div></div>
-        <div style="font-size:12px;color:var(--muted);" id="goal-text">cargando...</div>
-      </div>
-      <div class="section-label">leyendo ahora</div>
-      <div id="list-leyendo"></div>
     </div>
+
+    <div class="add-book-card" id="btn-add-book-card">
+      <div class="add-book-card-text">
+        <h3>Añadir un libro</h3>
+        <p>¿Cuál es tu siguiente lectura?</p>
+      </div>
+      <div class="add-book-card-plus">+</div>
+    </div>
+
+    <div class="stat-row">
+      <div class="goal-card" style="flex:1;margin-bottom:0;">
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">tu progreso</div>
+        <div style="font-family:var(--font-display);font-size:26px;color:var(--pink-800);margin-top:2px;"><span id="cnt-leido-big">0</span> / <span id="goal-year-num">30</span></div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">libros este año <span style="display:none;" id="goal-year"></span></div>
+        <div class="goal-bar-bg"><div class="goal-bar-fill" id="goal-bar" style="width:0%;"></div></div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px;display:flex;justify-content:space-between;">
+          <span id="goal-text">cargando...</span>
+          <button id="btn-edit-goal" style="font-size:10px;color:var(--pink-400);background:none;border:none;cursor:pointer;text-decoration:underline;">cambiar meta</button>
+        </div>
+      </div>
+      <div class="goal-card" style="flex:1;margin-bottom:0;display:flex;flex-direction:column;justify-content:space-between;">
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">estadísticas</div>
+        <div class="stat-row" style="margin:6px 0 0;gap:10px;">
+          <div style="text-align:center;flex:1;"><div style="font-family:var(--font-display);font-size:18px;color:var(--pink-600);" id="cnt-leyendo">0</div><div style="font-size:9px;color:var(--muted);">leyendo</div></div>
+          <div style="text-align:center;flex:1;"><div style="font-family:var(--font-display);font-size:18px;color:var(--pink-600);" id="cnt-tbr">0</div><div style="font-size:9px;color:var(--muted);">por leer</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-top:18px;">lecturas actuales</div>
+    <div id="list-leyendo"></div>
   </div>
+
 
   <!-- ESTANTERÍA -->
   <div id="s-estanteria" class="screen">
@@ -481,7 +573,7 @@ onAuthStateChanged(auth, async user => {
     document.getElementById('auth-screen').style.display = 'none';
     document.getElementById('app-screen').style.display = 'block';
     const nombre = user.displayName || user.email.split('@')[0];
-    document.getElementById('greeting').textContent = `hola, ${nombre} 👋`;
+    document.getElementById('greeting').textContent = `¿Qué leerás hoy, ${nombre}?`;
     renderPerfil();
     const yr = new Date().getFullYear();
     document.getElementById('goal-year').textContent = yr;
@@ -601,7 +693,8 @@ function renderInicio() {
   const leido = books.filter(b=>b.status==='leido');
   const tbr = books.filter(b=>b.status==='tbr');
   document.getElementById('cnt-leyendo').textContent = leyendo.length;
-  document.getElementById('cnt-leido').textContent = leido.length;
+  document.getElementById('cnt-leido-big').textContent = leido.length;
+  document.getElementById('goal-year-num').textContent = userGoal;
   document.getElementById('cnt-tbr').textContent = tbr.length;
   const pct = userGoal>0 ? Math.min(100,Math.round(leido.length/userGoal*100)) : 0;
   document.getElementById('goal-bar').style.width = pct+'%';
@@ -1112,11 +1205,11 @@ document.getElementById('btn-modal-save').addEventListener('click', async () => 
   try {
     if(editingBookId) {
       await updateDoc(doc(db,'books',editingBookId), data);
-      showToast('Libro actualizado 🌸');
+      showToast('Libro actualizado');
     } else {
       data.createdAt = new Date().toISOString();
       await addDoc(collection(db,'books'), data);
-      showToast('¡Libro agregado! 🌸');
+      showToast('¡Libro agregado!');
     }
     closeBookModal();
     await loadBooks();
@@ -1460,9 +1553,9 @@ document.getElementById('btn-guardar-nombre').addEventListener('click', async ()
   if (!nuevoNombre) { showToast('Poné un nombre'); return; }
   try {
     await updateProfile(currentUser, { displayName: nuevoNombre });
-    document.getElementById('greeting').textContent = `hola, ${nuevoNombre} 👋`;
+    document.getElementById('greeting').textContent = `¿Qué leerás hoy, ${nuevoNombre}?`;
     renderPerfil();
-    showToast('Nombre actualizado 🌸');
+    showToast('Nombre actualizado');
   } catch(e) { showToast('Error al guardar nombre'); }
 });
 
